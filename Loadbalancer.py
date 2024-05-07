@@ -25,6 +25,14 @@ def get_server_by_name(server_name, rest_data):
         case "UDP-Server":
             connect_to_server(SERVERS[server_name], socket.SOCK_DGRAM, False)
 
+def handle_client_connection(client_socket, client_address):
+    client_data = client_socket.recv(1024).decode()
+    data_dict = json.loads(client_data)
+    print("Received data from client:", client_data)
+    client_socket.close()
+    get_server_by_name(data_dict.pop("Connect to"), data_dict)
+    
+
 def receive_from_client():
     load_balancer_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     load_balancer_socket.bind((LOAD_BALANCER_HOST, LOAD_BALANCER_PORT))
@@ -35,11 +43,5 @@ def receive_from_client():
     while True:
         client_socket, client_address = load_balancer_socket.accept()
         print(f"Accepted connection from {client_address}")
-
-        client_data = client_socket.recv(1024).decode()
-        data_dict = json.loads(client_data)
-
-        print("Received data from client:", client_data)
-        
-        client_socket.close()
-        get_server_by_name(data_dict.pop("Connect to"), data_dict)
+        client_thread = threading.Thread(target=handle_client_connection, args=(client_socket, client_address))
+        client_thread.start()
