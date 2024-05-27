@@ -4,7 +4,9 @@ import json
 
 LOAD_BALANCER_HOST = "loadbalancer"
 LOAD_BALANCER_PORT = 9999
-SERVERS = {"TCP-Server": 8888, "UDP-Server": 8889}
+SERVERS = {"TCP-Server": [8888, 8889, 8890], "UDP-Server": [8891, 8892, 8893]}
+
+lock_thread = threading.Lock()
 
 def connect_to_server(server_adress, server_type, rest_data, connect_necessary):
     server_socket = socket.socket(socket.AF_INET, server_type)
@@ -19,11 +21,23 @@ def connect_to_server(server_adress, server_type, rest_data, connect_necessary):
 
 
 def get_server_by_name(server_name, rest_data):
-    match server_name:
-        case "TCP-Server":
-            connect_to_server(SERVERS[server_name], socket.SOCK_STREAM, rest_data, True)
-        case "UDP-Server":
-            connect_to_server(SERVERS[server_name], socket.SOCK_DGRAM, False)
+    with lock_thread:
+        if not SERVERS[server_name]:
+            raise Exception(f"No available ports for {server_name}")
+        
+        server_port = SERVERS[server_name].pop(0)
+    
+    try:
+        match server_name:
+            case "TCP-Server":
+                connect_to_server(server_port, socket.SOCK_STREAM, rest_data, True)
+            case "UDP-Server":
+                connect_to_server(server_port, socket.SOCK_DGRAM, False)
+    except:
+        raise Exception(f"Connecting to {server_name} unsuccessfull")
+    finally:
+        with lock_thread:
+            SERVERS[server_name].append(server_port)
 
 def handle_client_connection(client_socket, client_address):
     client_data = client_socket.recv(1024).decode()
