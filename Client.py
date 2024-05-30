@@ -18,7 +18,7 @@ def get_load_balancer_port():
             load_balancer_port = int(port_input)
             return load_balancer_port
         except ValueError:
-            print("Invalid input for port number. Please enter a valid number")
+            print("Invalid input for port number. Please enter a valid number.")
 
 
 
@@ -30,6 +30,17 @@ def get_hostname_from_ip(load_balancer_ip):
     except socket.gaierror as e:
         print(f"Error converting IP address: {e} ")
         return None
+    
+
+def get_server_type():
+    while True:
+        server_type = input("Choose a server (TCP or UDP): ").strip().upper()
+        if server_type in ["TCP", "UDP"]:
+            return server_type
+        else:
+            print("Invalid input. Please choose either TCP or UDP.")
+            
+
         
         
         
