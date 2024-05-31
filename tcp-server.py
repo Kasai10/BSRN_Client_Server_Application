@@ -20,7 +20,12 @@ class requestHandler(BaseHTTPRequestHandler):
         content_length = int(self.headers['Content-Length'])
         post_data = self.rfile.read(content_length)
         post_data_decoded = post_data.decode()
-        logging.info(f"POST request received from {self.client_address}, Payload: {post_data_decoded}")  
-
+        logging.info(f"POST request received from {self.client_address}, Payload: {post_data_decoded}") 
+         
+    def do_DELETE(self):
+        logging.info(f"DELETE request received from {self.client_address}")
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"Received DELETE request")     
 
     
