@@ -44,10 +44,68 @@ def get_server_type():
 
 def get_payload():
     message = input("Enter the message: ")
-    payload = json.dumps({"message": message})
+    server_type = get_server_type()
+    payload = json.dumps({"message": message, "\Connect to": server_type})
     return payload
 
 
+def send_message():
+    try:
+        load_balancer_ip = get_load_balancer_ip()
+        load_balancer_port = get_load_balancer_port()
+
+        payload = get_payload()
+        server_type = payload.get("Connect to")
+
+        if server_type == "TCP":
+            communicate_with_tcp_server(load_balancer_ip, load_balancer_port, payload)
+        elif server_type == "UDP":
+            communicate_with_udp_server(load_balancer_ip, load_balancer_port, payload)
+
+    except Exception as e:
+        print(f"An error has occurred: {e}")
+
+
+
+def communicate_with_tcp_server(load_balancer_ip, load_balancer_port, payload):
+    try:
+        tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        tcp_socket.connect((load_balancer_ip, load_balancer_port))
+
+        tcp_socket.sendall(payload.encode())
+
+        response = tcp_socket.recv(1024)
+        response_data = json.loads(response.decode())
+
+        print(f"Response from the server: {response_data}")
+    except json.JSONDecodeError:
+        print("Error while decoding the JSON response from the server")
+    except socket.error as e:
+        print(f"Socket error on the TCP server: {e}")
+    finally:
+        tcp_socket.close()
+
+
+def communicate_with_udp_server(load_balancer_ip, load_balancer_port, payload):
+    try:
+        udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+        udp_socket.sendto(payload.encode(), (load_balancer_ip, load_balancer_port))
+
+        response, _ = udp_socket.recvfrom(1024)
+        response_data = json.loads(response.decode())
+
+        print(f"Response from the server: {response_data}")
+    except json.JSONDecodeError:
+        print("Error while decoding the JSON response from the server")
+    except socket.error as e:
+        print(f"Socket error on the TCP server: {e}")
+    finally:
+        udp_socket.close()
+
+    
+
+send_message()
 
 
         
