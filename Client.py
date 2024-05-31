@@ -99,7 +99,7 @@ def communicate_with_udp_server(load_balancer_ip, load_balancer_port, payload):
     except json.JSONDecodeError:
         print("Error while decoding the JSON response from the server")
     except socket.error as e:
-        print(f"Socket error on the TCP server: {e}")
+        print(f"Socket error on the UDP server: {e}")
     finally:
         udp_socket.close()
 
