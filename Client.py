@@ -41,6 +41,15 @@ def get_server_type():
             print("Invalid input. Please choose either TCP or UDP.")
             
 
+
+def get_payload():
+    message = input("Enter the message: ")
+    payload = json.dumps({"message": message})
+    return payload
+
+
+
+
         
         
         
