@@ -74,3 +74,5 @@ def receive_from_client():
         print(f"Accepted connection from {client_address}")
         client_thread = threading.Thread(target=handle_client_connection, args=(client_socket, client_address))
         client_thread.start()
+
+receive_from_client()
