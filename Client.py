@@ -45,7 +45,7 @@ def get_server_type():
 def get_payload():
     message = input("Enter the message: ")
     server_type = get_server_type()
-    payload = json.dumps({"message": message, "\Connect to": server_type})
+    payload = json.dumps({"Message": message, "\Connect to": server_type})
     return payload
 
 
