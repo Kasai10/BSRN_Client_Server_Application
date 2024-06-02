@@ -74,10 +74,25 @@ def communicate_with_load_balancer(load_balancer_ip, load_balancer_port, payload
     try:
         tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         tcp_socket.connect((load_balancer_ip, load_balancer_port))
-
         tcp_socket.sendall(payload.encode())
+
+        response = receive_response_from_tcp_server
+        if response is not None:
+            print("Response from the server:", response)
+
     finally:
         tcp_socket.close()
+
+
+def receive_response_from_tcp_server(tcp_socket):
+    try:
+        response = tcp_socket.recv(4096)
+        return response.decode()
+    except socket.error as e:
+        print("Error receiving the response from the server: {e}")
+        return None
+    
+
 
 
 
