@@ -3,15 +3,15 @@ import threading
 import json
 import http.client
 
-LOAD_BALANCER_HOST = "loadbalancer"
+LOAD_BALANCER_HOST = "localhost"
 LOAD_BALANCER_PORT = 9999
-SERVERS = {"TCP-Server": [8888, 8889, 8890], "UDP-Server": [8891, 8892, 8893]}
+SERVER_HOST = "localhost"
+#How does the tcp server know if it should use http or https?
+SERVERS = {"TCP-Server": [80, 443], "UDP-Server": 8887}
 
-lock_thread = threading.Lock()
-
-def connect_to_server(server_adress, server_type, rest_data, connect_necessary):
+def connect_to_server(server_port, server_type, rest_data, connect_necessary):
     server_socket = socket.socket(socket.AF_INET, server_type)
-    
+    server_adress = (SERVER_HOST, server_port)
     data_json = json.dumps(rest_data)
 
     if(connect_necessary):
@@ -34,32 +34,26 @@ def connect_to_server(server_adress, server_type, rest_data, connect_necessary):
     server_socket.close()
 
 
-def get_server_by_name(server_name, server_address, rest_data):
-    with lock_thread:
-        if not SERVERS[server_name]:
-            raise Exception(f"No available ports for {server_name}")
-        
-        server_port = SERVERS[server_name].pop(0)
-        server_address = (server_address, server_port)
+def get_server_by_name(server_name, rest_data):
+   
+    server_port = SERVERS[server_name][0] #must be changed when I know how the http/https is determined
     
     try:
         match server_name:
             case "TCP-Server":
-                connect_to_server(server_address, socket.SOCK_STREAM, rest_data, True)
+                connect_to_server(server_port, socket.SOCK_STREAM, rest_data, True)
             case "UDP-Server":
-                connect_to_server(server_address, socket.SOCK_DGRAM, rest_data, False)
+                connect_to_server(server_port, socket.SOCK_DGRAM, rest_data, False)
     except:
         raise Exception(f"Connecting to {server_name} unsuccessfull")
-    finally:
-        with lock_thread:
-            SERVERS[server_name].append(server_port)
+
 
 def handle_client_connection(client_socket):
     client_data = client_socket.recv(1024).decode()
     data_dict = json.loads(client_data)
     print("Received data from client:", client_data)
     client_socket.close()
-    get_server_by_name(data_dict.pop("Connect to"), data_dict.pop("IP-Adress"),data_dict)
+    get_server_by_name(data_dict.pop("Connect to"),data_dict)
     
 
 def receive_from_client():
@@ -74,5 +68,6 @@ def receive_from_client():
         print(f"Accepted connection from {client_address}")
         client_thread = threading.Thread(target=handle_client_connection, args=(client_socket, client_address))
         client_thread.start()
+        handle_client_connection(client_socket)
 
 receive_from_client()
