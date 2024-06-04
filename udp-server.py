@@ -6,7 +6,7 @@ def server(ports): #hier mach ich den Port als parameter mal lieber in eine funk
     for port in ports:    #Nun soll der server nicht nur auf eine portnummer sondern auf mehreren lauschen, weswegen ich hier nh schleife eingebaut habe die immer aus der liste ports die portnnummern entnimmt und in die variable port steckt und dann die nachricht durchgeht
      socket1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #Hier wird dann halt das Socket als UDP Socket erstellt, der IPv4-Adressem benutzt.
      print ("Ein neues Socket wurde erstellt") #Für die bessere Übersicht dann einfach nh response, dass das Socket erstellt worden ist, wenn alles glatt läuft
-   
+     socketlist.append(socket1) #Brauchen natürlich noch eine methode, wo ein neues socket dann überhaupt erst in die Liste hinzugefügt wird.
      adresse=('', port) #Hier deklariere ich eine neue variable, die einfach die server adresse ist. Port wie gesagt, die portnummer, die in der funktion vom user deklariert wird und dann ein leerer string, wodurch dann alle IP-Adressen eine Verbindung zum Server aufbauen können. Ausserdem ist ein Tupel hier glaube ich erforderlich, weil die methode bind soweit ich weiss nur bei tupel funktioniert
      socket1.bind(adresse) #Damit das Betriebssystem dann weiss, dass alle packets, die an dem vom user gegebenen Ports gesendet werden auch an das Socket weitergeschickt werden sollen.
     
