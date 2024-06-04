@@ -8,8 +8,8 @@ LOAD_BALANCER_PORT = 9999
 def get_server_type():
     while True:
         server_type = input("Choose a server (TCP or UDP): ").strip().upper()
-        if server_type in ["TCP-Server", "UDP-Server"]:
-            return server_type
+        if server_type in ["TCP", "UDP"]:
+            return f"{server_type}-Server"
         else:
             print("Invalid input. Please choose either TCP or UDP.")
 
@@ -29,7 +29,7 @@ def get_payload():
     server_type = get_server_type()
     method = get_http_method(server_type)
     message = input("Enter the message: ")
-    payload = json.dumps({"Connect to": server_type, "\Message": message, "\Method": method})
+    payload = json.dumps({"Connect to": server_type, "Message": message, "Method": method})
     return payload
 
 
@@ -62,7 +62,7 @@ def receive_response_from_tcp_server(tcp_socket):
         decoded_response = json.loads(response.decode())
         return decoded_response
     except socket.error as e:
-        print("Error receiving the response from the server: {e}")
+        print(f"Error receiving the response from the server: {e}")
         return None
     except json.JSONDecodeError as e:
         print(f"Error decoding the JSON response: {e}")
