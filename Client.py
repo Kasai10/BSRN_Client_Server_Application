@@ -35,17 +35,26 @@ def get_hostname_from_ip(load_balancer_ip):
 def get_server_type():
     while True:
         server_type = input("Choose a server (TCP or UDP): ").strip().upper()
-        if server_type in ["TCP", "UDP"]:
+        if server_type in ["TCP-Server", "UDP-Server"]:
             return server_type
         else:
             print("Invalid input. Please choose either TCP or UDP.")
+
+def get_http_method():
+    while True:
+        method: input("Choose an HTTP method (GET, PUT, POST, DELETE): ").strip().upper() # type: ignore
+        if method in ["GET", "PUT", "POST", "DELETE"]:
+            return method
+        else:
+            print("Invalid input. Please choose either GET, PUT, POST or DELETE. ")
             
 
 
 def get_payload():
+    method = get_http_method()
     message = input("Enter the message: ")
     server_type = get_server_type()
-    payload = json.dumps({"Message": message, "\Connect to": server_type})
+    payload = json.dumps({"Connect to": server_type, "\Message": message, "\Method": method})
     return payload
 
 
@@ -55,55 +64,37 @@ def send_message():
         load_balancer_port = get_load_balancer_port()
 
         payload = get_payload()
-        server_type = payload.get("Connect to")
-
-        if server_type == "TCP":
-            communicate_with_tcp_server(load_balancer_ip, load_balancer_port, payload)
-        elif server_type == "UDP":
-            communicate_with_udp_server(load_balancer_ip, load_balancer_port, payload)
-
+        communicate_with_load_balancer(load_balancer_ip, load_balancer_port, payload)
     except Exception as e:
         print(f"An error has occurred: {e}")
 
 
 
-def communicate_with_tcp_server(load_balancer_ip, load_balancer_port, payload):
+def communicate_with_load_balancer(load_balancer_ip, load_balancer_port, payload):
     try:
         tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         tcp_socket.connect((load_balancer_ip, load_balancer_port))
-
         tcp_socket.sendall(payload.encode())
 
-        response = tcp_socket.recv(1024)
-        response_data = json.loads(response.decode())
+        response = receive_response_from_tcp_server
+        if response is not None:
+            print("Response from the server:", response)
 
-        print(f"Response from the server: {response_data}")
-    except json.JSONDecodeError:
-        print("Error while decoding the JSON response from the server")
-    except socket.error as e:
-        print(f"Socket error on the TCP server: {e}")
     finally:
         tcp_socket.close()
 
 
-def communicate_with_udp_server(load_balancer_ip, load_balancer_port, payload):
+def receive_response_from_tcp_server(tcp_socket):
     try:
-        udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
-        udp_socket.sendto(payload.encode(), (load_balancer_ip, load_balancer_port))
-
-        response, _ = udp_socket.recvfrom(1024)
-        response_data = json.loads(response.decode())
-
-        print(f"Response from the server: {response_data}")
-    except json.JSONDecodeError:
-        print("Error while decoding the JSON response from the server")
+        response = tcp_socket.recv(4096)
+        return response.decode()
     except socket.error as e:
-        print(f"Socket error on the UDP server: {e}")
-    finally:
-        udp_socket.close()
-
+        print("Error receiving the response from the server: {e}")
+        return None
     
+
+
+
 
 send_message()
 
