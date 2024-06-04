@@ -1,5 +1,7 @@
 import socket #Die bibliothek brauche ich natürlich um Zugriff auf Netzwerksockets zu erhalten und einen Netzwerkserver zu erstellen.
 import sys # Damit man kommandozeilenargumente lesen kann und das Programm beenden kann
+import logging #Damit ein feedback zum client via file entsteht
+import json #Nachrichtenformat
 def server(ports): #hier mach ich den Port als parameter mal lieber in eine funktion um das ganze dynamischer und bisschen ordentlicher zu gestalten 
     buffersize = 4096 # Hier wird dann die Buffer size deklariert in höhe von 4096 bytes, da dies eine standartmässige verwendung für UDP Datagramme hat und ich die Puffregrösse definitv auch für die recvform methode brauchen werde
     socketlist = []
@@ -15,7 +17,12 @@ def server(ports): #hier mach ich den Port als parameter mal lieber in eine funk
             nachricht, adresseclient = socket1.recvfrom(buffersize) #Hier ist eine Methode, die quasi den Code anhält und unterbricht, bis eine Nachricht ankommt. Bisher nur als Bytearray
             konkretenachricht = nachricht.decode() #Hier wird die nachricht dann decodiert, weil sie normalerweise als Binärdaten empfangen wird.
             print(f"Empfangene Nachricht von {adresseclient}: {nachricht.decode()}") 
-            antwort = "UDP: Ihre Nachricht wurde entgegengenommen"#Hier wird dann eine variable erstellt, die später dann als feedback an den client geschickt wird
+            antwort = {
+                "status":"success",
+                "message":"Ihre Nachricht wurde entgegengenommen",
+                "data": konkretenachricht
+             } 
+            jsonantwort = json.dumps(antwort)
             socket1.sendto(antwort.encode(), adresseclient) 
     
 if __name__=="__main__": #Das hier ist quasi eine Sicherheitsvorkehrung dass das Skript hier nur in bestimmten massen ausgeführt wird, damit mien code nicht einfach startet ohne beispielsweise eine portnummer zu haben
