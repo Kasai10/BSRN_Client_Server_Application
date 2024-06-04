@@ -17,7 +17,7 @@ def get_http_method(server_type):
     if server_type == "UDP-Server":
      return ""
     while True:
-        method: input("Choose an HTTP method (GET, PUT, POST, DELETE): ").strip().upper() # type: ignore
+        method = input("Choose an HTTP method (GET, PUT, POST, DELETE): ").strip().upper() 
         if method in ["GET", "PUT", "POST", "DELETE"]:
             return method
         else:
@@ -48,7 +48,7 @@ def communicate_with_load_balancer(payload):
         tcp_socket.connect((LOAD_BALANCER_HOST, LOAD_BALANCER_PORT))
         tcp_socket.sendall(payload.encode())
 
-        response = receive_response_from_tcp_server
+        response = receive_response_from_tcp_server(tcp_socket)
         if response is not None:
             print("Response from the server:", response)
 
