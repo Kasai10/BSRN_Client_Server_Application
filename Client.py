@@ -59,13 +59,15 @@ def communicate_with_load_balancer(payload):
 def receive_response_from_tcp_server(tcp_socket):
     try:
         response = tcp_socket.recv(4096)
-        return response.decode()
+        decoded_response = json.loads(response.decode())
+        return decoded_response
     except socket.error as e:
         print("Error receiving the response from the server: {e}")
         return None
+    except json.JSONDecodeError as e:
+        print(f"Error decoding the JSON response: {e}")
+        return None
     
-
-
 
 
 send_message()
