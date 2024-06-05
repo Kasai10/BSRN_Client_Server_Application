@@ -1,33 +1,35 @@
 import logging
 from http.server import BaseHTTPRequestHandler, HTTPServer 
 import argparse
+import json
 
 class requestHandler(BaseHTTPRequestHandler): 
     def do_GET(self): 
-        logging.info(f"GET request received from {self.client_address}") 
-        self.send_response(200)
-        self.end_headers()
-        self.wfile.write(b"Hello, world!")
+        self.respond_to_client(self, "GET")
 
     def do_PUT(self):
-        content_length = int(self.headers['Content-Length'])
-        post_data = self.rfile.read(content_length)
-        logging.info(f"PUT request received from {self.client_address}, Payload: {post_data.decode()}")
-        self.send_response(200)
-        self.end_headers()
-        self.wfile.write(b"Received PUT request")
+        self.handle_payload(self, "PUT")
 
     def do_POST(self):
-        content_length = int(self.headers['Content-Length'])
-        post_data = self.rfile.read(content_length)
-        post_data_decoded = post_data.decode()
-        logging.info(f"POST request received from {self.client_address}, Payload: {post_data_decoded}") 
+        self.handle_payload(self, "POST")
 
     def do_DELETE(self):
-        logging.info(f"DELETE request received from {self.client_address}")
+        self.respond_to_client(self, "DELETE")
+
+    def respond_to_client(self, type):
         self.send_response(200)
+        self.send_header("Content-type", "application/json")
         self.end_headers()
-        self.wfile.write(b"Received DELETE request")     
+        response = json.dumps("Received " + type +  "-Request")
+        self.wfile.write(response)
+
+    def handle_payload(self, type):
+        message_length = int(self.headers['Content-Length'])
+        self.respond_to_client(self, type)
+        decoded_message = self.rfile.read(message_length).decode
+
+
+        
 
 def main():
     parser = argparse.ArgumentParser(description='Start TCP Server')
@@ -35,6 +37,7 @@ def main():
     args = parser.parse_args()
     # '%(levelname)s' Schweregrad, '%(name)s' Namen des Loggers, '%(filename)s' Name der Datei '%(lineno)d' Zeilennummer
     logging.basicConfig(filename=args.logdatei, level=logging.INFO, format='%(asctime)s - %(message)s')
+    
     server_address = ('', 8080)
     httpd = HTTPServer(server_address, requestHandler)
 
@@ -46,6 +49,7 @@ def main():
 
     httpd.server_close()
     logging.info("Stopping TCP server")
+
 
 if __name__ == "__main__":
     main()
