@@ -21,12 +21,12 @@ class requestHandler(BaseHTTPRequestHandler):
         self.send_header("Content-type", "application/json")
         self.end_headers()
         response = json.dumps("Received " + type +  "-Request")
-        self.wfile.write(response)
+        self.wfile.write(response.encode())
 
     def handle_payload(self, type):
         message_length = int(self.headers['Content-Length'])
         self.respond_to_client(self, type)
-        decoded_message = self.rfile.read(message_length).decode
+        decoded_message = self.rfile.read(message_length).decode()
 
 
         
