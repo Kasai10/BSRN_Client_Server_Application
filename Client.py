@@ -3,6 +3,8 @@ import json
 
 LOAD_BALANCER_HOST = "localhost"
 LOAD_BALANCER_PORT = 9999
+UDP_SERVER_PORT = 8887
+BUFFER_SIZE = 4096
 
 
 def get_server_type():
@@ -50,8 +52,10 @@ def communicate_with_load_balancer(payload):
 
         response = receive_response_from_tcp_server(tcp_socket)
         if response is not None:
-            print("Response from the server:", response)
-
+            print("Response from the TCP server:")
+            print(json.dumps(response, indent=4))
+    except Exception as e:
+        print(f"Error communicating to the load balancer: {e}")
     finally:
         tcp_socket.close()
 
@@ -63,15 +67,38 @@ def receive_response_from_tcp_server(tcp_socket):
         print(json.loads(decoded_response))
         return decoded_response
     except socket.error as e:
-        print(f"Error receiving the response from the server: {e}")
-        return None
+        print(f"Error receiving the response from the  TCP server: {e}")
     except json.JSONDecodeError as e:
         print(f"Error decoding the JSON response: {e}")
-        return None
+    
+
+def receive_response_from_udp_server():
+    udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    udp_socket.bind(('', UDP_SERVER_PORT))
+    print(f"Listening for UDP response on port {UDP_SERVER_PORT}...")
+
+    try:
+        while True:
+            message, server_address = udp_socket.recvfrom(BUFFER_SIZE)
+            decoded_message = message.decode()
+            try:
+                json_response = json.loads(decoded_message)
+                print(f"Response from the UDP server:")
+                print(json.dumps(json_response, indent=4))
+            except json.JSONDecodeError as e:
+                print(f"Error decoding the JSON response: {e}")
+                print(f"Raw response from UDP server: {decoded_message}")
+
+    except socket.error as e:
+        print(f"Error receiving the response from the UDP server: {e}")
+    finally:
+        udp_socket.close()
     
 
 
-send_message()
+if __name__ == "__main__":
+    send_message()
+    receive_response_from_udp_server()
 
 
         
