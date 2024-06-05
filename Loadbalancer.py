@@ -7,6 +7,7 @@ LOAD_BALANCER_HOST = "localhost"
 LOAD_BALANCER_PORT = 9999
 SERVER_HOST = "localhost"
 #How does the tcp server know if it should use http or https?
+#Very confusing
 SERVERS = {"TCP-Server": [8000, 80, 443], "UDP-Server": 8887}
 
 def connect_to_server(server_port, server_type, rest_data, connect_necessary):
