@@ -17,6 +17,7 @@ class request_handler(BaseHTTPRequestHandler):
     def do_DELETE(self):
         self.respond_to_client(self, "DELETE")
 
+
     def respond_to_client(self, method: str):
         try:
             self.send_response(200)
@@ -28,6 +29,13 @@ class request_handler(BaseHTTPRequestHandler):
         except (Exception, json.JSONDecodeError) as e:
             logging.error(f"Error responding to {method} request: {e}")
             self.send_error(500, "Internal Server Error")
+            
+    def respond_to_client(self, type):
+        self.send_response(200)
+        self.send_header("Content-type", "application/json")
+        self.end_headers()
+        response = json.dumps("Received " + type +  "-Request")
+        self.wfile.write(response.encode())
 
     def handle_payload(self, method: str):
         try:
@@ -39,9 +47,7 @@ class request_handler(BaseHTTPRequestHandler):
         except (ValueError, UnicodeDecodeError):  
             logging.error(f"Error processing request: {method}, Path: {self.path}")
             self.send_error(400, "Bad Request")  
-
-              
-          
+                     
 def start_server():
  
     server_address = ('', 8080)
@@ -58,6 +64,8 @@ def start_server():
         logging.info("Stopping TCP server")
 
     httpd.server_close()
+
+    print("Server is down")
     logging.info("Stopping TCP server")
 
 
