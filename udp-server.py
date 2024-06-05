@@ -1,5 +1,4 @@
 import socket #Die bibliothek brauche ich natürlich um Zugriff auf Netzwerksockets zu erhalten und einen Netzwerkserver zu erstellen.
-import sys # Damit man kommandozeilenargumente lesen kann und das Programm beenden kann
 import logging #Damit ein feedback zum client via file entsteht
 import json #Nachrichtenformat
 def server(ports): #hier mach ich den Port als parameter mal lieber in eine funktion um das ganze dynamischer und bisschen ordentlicher zu gestalten 
