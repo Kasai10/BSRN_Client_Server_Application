@@ -66,7 +66,7 @@ def receive_from_client():
     while True:
         client_socket, client_address = load_balancer_socket.accept()
         print(f"Accepted connection from {client_address}")
-        client_thread = threading.Thread(target=handle_client_connection, args=(client_socket, client_address))
+        client_thread = threading.Thread(target=handle_client_connection, args=(client_socket))
         client_thread.start()
         handle_client_connection(client_socket)
 
