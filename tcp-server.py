@@ -40,6 +40,7 @@ def main():
     
     server_address = ('localhost', 8000)
     httpd = HTTPServer(server_address, requestHandler)
+    print("TCP-Server listening on " + server_address[0] + " " + server_address[1])
 
     logging.info("Starting TCP server on port 40")
     try:
@@ -48,6 +49,8 @@ def main():
         pass
 
     httpd.server_close()
+
+    print("Server is down")
     logging.info("Stopping TCP server")
 
 
