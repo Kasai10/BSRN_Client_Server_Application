@@ -52,7 +52,6 @@ def handle_client_connection(client_socket):
     client_data = client_socket.recv(1024).decode()
     data_dict = json.loads(client_data)
     print("Received data from client:", client_data)
-    client_socket.close()
     get_server_by_name(data_dict.pop("Connect to"),data_dict)
     
 
