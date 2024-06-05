@@ -38,7 +38,7 @@ def main():
     # '%(levelname)s' Schweregrad, '%(name)s' Namen des Loggers, '%(filename)s' Name der Datei '%(lineno)d' Zeilennummer
     logging.basicConfig(filename=args.logdatei, level=logging.INFO, format='%(asctime)s - %(message)s')
     
-    server_address = ('localhost', 40)
+    server_address = ('localhost', 8000)
     httpd = HTTPServer(server_address, requestHandler)
 
     logging.info("Starting TCP server on port 40")
