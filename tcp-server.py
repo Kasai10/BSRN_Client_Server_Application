@@ -43,9 +43,7 @@ class request_handler(BaseHTTPRequestHandler):
               
           
 def start_server():
-    logging.basicConfig(filename="", level=logging.INFO, format='%(asctime)s  %(levelname)s %(message)s')
-    logging.info("Starting TCP server on port 8080")
-    
+ 
     server_address = ('', 8080)
     httpd = HTTPServer(server_address, request_handler)
 
@@ -62,10 +60,19 @@ def start_server():
     httpd.server_close()
     logging.info("Stopping TCP server")
 
+
+def start_logging(log_file_path=None):
+    if log_file_path:
+        logging.basicConfig(filename=log_file_path, level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
+        logging.info("Starting TCP server on port 8080")
+    else:
+        logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='TCP Server')
-    parser.add_argument('-logdatei', type=str, required=True, help='Log datei Pfad und Name')
+    parser = argparse.ArgumentParser(description="TCP Server")
+    parser.add_argument('-logdatei', dest="logfile", type=str, required=True, help='Log datei Pfad und Name')
     args = parser.parse_args()
-    start_server(args.log_file)
+    start_logging(args.logfile)
+    start_server()
 
     
