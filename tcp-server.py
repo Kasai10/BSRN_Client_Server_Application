@@ -18,7 +18,7 @@ class request_handler(BaseHTTPRequestHandler):
         self.respond_to_client(self, "DELETE")
 
 
-    def respond_to_client(self, method: str):
+    def respond_to_client(self, method):
         try:
             self.send_response(200)
             self.send_header("Content-type", "application/json")
@@ -30,34 +30,27 @@ class request_handler(BaseHTTPRequestHandler):
             logging.error(f"Error responding to {method} request: {e}")
             self.send_error(500, "Internal Server Error")
             
-    def respond_to_client(self, type):
-        self.send_response(200)
-        self.send_header("Content-type", "application/json")
-        self.end_headers()
-        response = json.dumps("Received " + type +  "-Request")
-        self.wfile.write(response.encode())
-
-    def handle_payload(self, method: str):
+    def handle_payload(self, method):
         try:
             message_length = int(self.headers['Content-Length'])
             self.respond_to_client(self, type)
             payload = self.rfile.read(message_length).decode()
             logging.info(f"Received {method} request - Path: {self.path}, Payload: {payload}") 
-            self.respond_to_client(self, method: str)
+            self.respond_to_client(self, method)
         except (ValueError, UnicodeDecodeError):  
             logging.error(f"Error processing request: {method}, Path: {self.path}")
             self.send_error(400, "Bad Request")  
                      
 def start_server():
  
-    server_address = ('', 8080)
+    server_address = ('localhost', 8000)
     httpd = HTTPServer(server_address, request_handler)
 
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
         pass
-    except (OSError, socket.error) as e:
+    except (OSError) as e:
         logging.error(f"Server startup error: {e}")
     finally:
         httpd.server_close()
@@ -72,7 +65,7 @@ def start_server():
 def start_logging(log_file_path=None):
     if log_file_path:
         logging.basicConfig(filename=log_file_path, level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
-        logging.info("Starting TCP server on port 8080")
+        logging.info("Starting TCP server on port 800")
     else:
         logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 
