@@ -96,8 +96,8 @@ def receive_response_from_udp_server():
 
 
 if __name__ == "__main__":
-send_message()
-receive_response_from_udp_server()
+    send_message()
+    receive_response_from_udp_server()
 
 
         
