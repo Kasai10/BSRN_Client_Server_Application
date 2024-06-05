@@ -14,6 +14,7 @@ def server(ports): #hier mach ich den Port als parameter mal lieber in eine funk
     
     while True: #Hier geht es dann in die Schleife, wodurch der Server dann permanent auf eine neue Nachricht warten kann. 
         for socket1 in socketlist: #Da wir nun mit mehreren Ports arbeiten wollen, brauchen wir auch mehrere sockets, weswegen wir zuvor eine liste implementiert haben, welche hier iteriert wird.
+
             nachricht, adresseclient = socket1.recvfrom(buffersize) #Hier ist eine Methode, die quasi den Code anhält und unterbricht, bis eine Nachricht ankommt. Bisher nur als Bytearray
             konkretenachricht = nachricht.decode() #Hier wird die nachricht dann decodiert, weil sie normalerweise als Binärdaten empfangen wird.
             print(f"Empfangene Nachricht von {adresseclient}: {nachricht.decode()}") 
@@ -26,12 +27,7 @@ def server(ports): #hier mach ich den Port als parameter mal lieber in eine funk
             socket1.sendto(antwort.encode(), adresseclient) 
     
 if __name__=="__main__": #Das hier ist quasi eine Sicherheitsvorkehrung dass das Skript hier nur in bestimmten massen ausgeführt wird, damit mien code nicht einfach startet ohne beispielsweise eine portnummer zu haben
-    if len(sys.argv)<2: #Da ja immer skript name und das skript selbst sowie die portnumer angegeben werden müssen, kann man durch die if anweisung hier prüfen ob eine portnummer vorhanden ist
-        print ("Geben Sie eine Portnumber an")
-        sys.exit(2) #Hab jetzt einfach 2 als rückgabewert zurückgeben lassen als feedback 
-
-
-    portnummern = [int(port) for port in sys.argv[1:]] #List-comprehension 
+    portnummern = [8000, 8001, 8002] #Ich hab hier einfach mal eine kleiner gruppe an Ports ausgewählt, da der loadbalacner ja wissen muss welche Ports zum UDP server führen.
     server(portnummern) 
 
 
