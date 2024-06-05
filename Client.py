@@ -64,7 +64,7 @@ def receive_response_from_tcp_server(tcp_socket):
     try:
         response = tcp_socket.recv(4096)
         decoded_response = json.loads(response.decode())
-        print(json.loads(decoded_response))
+        print(json.dumps(decoded_response, indent=4))
         return decoded_response
     except socket.error as e:
         print(f"Error receiving the response from the  TCP server: {e}")

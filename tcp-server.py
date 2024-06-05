@@ -6,16 +6,16 @@ import json
 
 class request_handler(BaseHTTPRequestHandler): 
     def do_GET(self): 
-        self.respond_to_client(self, "GET")
+        self.respond_to_client("GET")
 
     def do_PUT(self):
-        self.handle_payload(self, "PUT")
+        self.handle_payload("PUT")
 
     def do_POST(self):
-        self.handle_payload(self, "POST")
+        self.handle_payload("POST")
 
     def do_DELETE(self):
-        self.respond_to_client(self, "DELETE")
+        self.respond_to_client("DELETE")
 
 
     def respond_to_client(self, method):
@@ -25,18 +25,19 @@ class request_handler(BaseHTTPRequestHandler):
             self.end_headers()
             response = json.dumps(f"Received {method} request for path: {self.path}")
             self.wfile.write(response.encode())
-
-        except (Exception, json.JSONDecodeError) as e:
-            logging.error(f"Error responding to {method} request: {e}")
+        except Exception as e:
+            print(f"Error responding to {method} request: {e}")
             self.send_error(500, "Internal Server Error")
+        finally:
+            self.wfile.flush()  # Ensure all data is flushed before closing the connection
             
     def handle_payload(self, method):
         try:
             message_length = int(self.headers['Content-Length'])
-            self.respond_to_client(self, type)
+            self.respond_to_client(type)
             payload = self.rfile.read(message_length).decode()
             logging.info(f"Received {method} request - Path: {self.path}, Payload: {payload}") 
-            self.respond_to_client(self, method)
+            self.respond_to_client(method)
         except (ValueError, UnicodeDecodeError):  
             logging.error(f"Error processing request: {method}, Path: {self.path}")
             self.send_error(400, "Bad Request")  
