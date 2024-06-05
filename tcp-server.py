@@ -42,7 +42,7 @@ def main():
     httpd = HTTPServer(server_address, requestHandler)
     print("TCP-Server listening on " + server_address[0] + " " + server_address[1])
 
-    logging.info("Starting TCP server on port 40")
+    logging.info("Starting TCP server on port " + server_address[1])
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
