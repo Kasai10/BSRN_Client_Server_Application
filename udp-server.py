@@ -13,14 +13,22 @@ def server(ports): #hier mach ich den Port als parameter mal lieber in eine funk
      except Exception as socketfehler:
         print("Das Erstellen des Sockets mit Port : {Port} hat nicht funktioniert")
         continue
-     adresse=('', port) #Hier deklariere ich eine neue variable, die einfach die server adresse ist. Port wie gesagt, die portnummer, die in der funktion vom user deklariert wird und dann ein leerer string, wodurch dann alle IP-Adressen eine Verbindung zum Server aufbauen können. Ausserdem ist ein Tupel hier glaube ich erforderlich, weil die methode bind soweit ich weiss nur bei tupel funktioniert
-     socket1.bind(adresse) #Damit das Betriebssystem dann weiss, dass alle packets, die an dem vom user gegebenen Ports gesendet werden auch an das Socket weitergeschickt werden sollen.
+     try:
+        adresse=('', port) #Hier deklariere ich eine neue variable, die einfach die server adresse ist. Port wie gesagt, die portnummer, die in der funktion vom user deklariert wird und dann ein leerer string, wodurch dann alle IP-Adressen eine Verbindung zum Server aufbauen können. Ausserdem ist ein Tupel hier glaube ich erforderlich, weil die methode bind soweit ich weiss nur bei tupel funktioniert
+        socket1.bind(adresse) #Damit das Betriebssystem dann weiss, dass alle packets, die an dem vom user gegebenen Ports gesendet werden auch an das Socket weitergeschickt werden sollen.
+     except Exception as bindfehlgeschlagen:
+         print("Das Binden des Sockets hat nicht geklappt")
+         continue
     
     while True: #Hier geht es dann in die Schleife, wodurch der Server dann permanent auf eine neue Nachricht warten kann. 
         for socket1 in socketlist: #Da wir nun mit mehreren Ports arbeiten wollen, brauchen wir auch mehrere sockets, weswegen wir zuvor eine liste implementiert haben, welche hier iteriert wird.
             
+            try:
+                nachricht, adresseclient = socket1.recvfrom(buffersize) #Hier ist eine Methode, die quasi den Code anhält und unterbricht, bis eine Nachricht ankommt. Bisher nur als Bytearray
+            except Exception as nachrichtempfangen:
+                print("Die Nachricht konnte nicht Empfangen werden")
+                continue
 
-            nachricht, adresseclient = socket1.recvfrom(buffersize) #Hier ist eine Methode, die quasi den Code anhält und unterbricht, bis eine Nachricht ankommt. Bisher nur als Bytearray
             try:    
                     konkretenachricht = nachricht.decode() #Hier wird die nachricht dann decodiert, weil sie normalerweise als Binärdaten empfangen wird.
                     print(f"Empfangene Nachricht von {adresseclient}: {nachricht.decode()}") 
