@@ -24,6 +24,7 @@ class request_handler(BaseHTTPRequestHandler):
             self.send_header("Content-type", "application/json")
             self.end_headers()
             response = json.dumps(f"Received {method} request for path: {self.path}")
+            print(response)
             self.wfile.write(response.encode())
         except Exception as e:
             print(f"Error responding to {method} request: {e}")
