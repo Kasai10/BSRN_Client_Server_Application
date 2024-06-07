@@ -1,5 +1,4 @@
 import logging
-import ssl
 from http.server import BaseHTTPRequestHandler, HTTPServer 
 import argparse
 import json
@@ -23,9 +22,10 @@ class request_handler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header("Content-type", "application/json")
             self.end_headers()
-            response = json.dumps(f"Received {method} request for path: {self.path}")
+            response = json.dumps(f"TCP-Server Response: received {method} request for path: {self.path}")
             logging.info(response)
             self.wfile.write(response.encode())
+            print(f"Message sent to client")
         except Exception as e:
             print(f"Error responding to {method} request: {e}")
             self.send_error(500, "Internal Server Error")
@@ -50,17 +50,19 @@ def start_server():
 
     try:
         httpd.serve_forever()
+        print(f"TCP-Server started")
     except KeyboardInterrupt:
         pass
     except (OSError) as e:
         logging.error(f"Server startup error: {e}")
+        print("Server startup error:  {e}")
     finally:
         httpd.server_close()
         logging.info("Stopping TCP server")
 
     httpd.server_close()
 
-    print("Server is down")
+    print("Server is closed")
     logging.info("Stopping TCP server")
 
 
