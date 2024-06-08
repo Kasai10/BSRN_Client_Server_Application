@@ -17,49 +17,53 @@ class request_handler(BaseHTTPRequestHandler):
         self.respond_to_client("DELETE")
 
 
-    def respond_to_client(self, method):
+    def respond_to_client(self, method, payload):
         try:
+            print(f"Incoming message from Client")
             self.send_response(200)
             self.send_header("Content-type", "application/json")
             self.end_headers()
-            response = json.dumps(f"TCP-Server received {method} request")
+
+            response = json.dumps(f"TCP-Server received {method} request, Payload: {payload}")
+            response = response.replace('\\', '').replace('"', '')
             logging.info(response)
             self.wfile.write(response.encode())
-            print(f"Message sent to client")
+            print(f"Following message sent to client: {response}")
         except ConnectionResetError:
             logging.error(f"Connection reset by client during {method} request")
             print(f"Connection reset by client during {method} request")
         except Exception as e:
             print(f"Error responding to {method} request: {e}")
             self.send_error(500, "Internal Server Error")
-        finally:
-            self.wfile.flush()  # Ensure all data is flushed before closing the connection
-            
+        
     def handle_payload(self, method):
         try:
             message_length = int(self.headers['Content-Length'])
             payload = self.rfile.read(message_length).decode()
-            logging.info(f"Received {method} request, Payload: {payload}") 
-            print(f"Payload from Client: {payload}")
+            #logging.info(f"TCP-Server received {method} request, Payload: {payload}") 
+            #print(f"Payload from Client: {payload}")
+            self.respond_to_client(method, payload)
         except (ValueError, UnicodeDecodeError):  
             logging.error(f"Error processing request: {method}, Path: {self.path}")
             self.send_error(400, "Bad Request")  
         finally:
-            self.respond_to_client(method)
+            self.respond_to_client(method, {})
 
 
     def log_request(self, code='-', size='-'):
-        logging.info(f"Client IP Address {self.client_address[0]} -  \"{self.requestline}\" ")
-        print(f"Client IP: {self.client_address[0]}  [{self.log_date_time_string()}] \"{self.requestline}\" ")
+        logging.info(f"Request currently being handled: Client IP Address {self.client_address[0]}, Type: {self.requestline}")
+        print(f"[{self.log_date_time_string()}] Client IP: {self.client_address[0]}, Request details: {self.requestline} ")
 
 def start_server():
  
     server_address = ('localhost', 8000)
     httpd = HTTPServer(server_address, request_handler)
+    logging.info(f"TCP server has started on port 8000")
+    print(f"TCP server has started on port 8000")
 
     try:
         httpd.serve_forever()
-        print(f"TCP-Server started")
+        
     except KeyboardInterrupt:
         pass
     except (OSError) as e:
@@ -78,7 +82,8 @@ def start_server():
 def start_logging(log_file_path=None):
     if log_file_path:
         logging.basicConfig(filename=log_file_path, level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
-        logging.info("Starting TCP server on port 800")
+        logging.info("Starting logging")
+        print("Starting logging")
     else:
         logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 
