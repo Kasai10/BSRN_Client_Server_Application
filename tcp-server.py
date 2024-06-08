@@ -38,7 +38,6 @@ class request_handler(BaseHTTPRequestHandler):
     def handle_payload(self, method):
         try:
             message_length = int(self.headers['Content-Length'])
-            self.respond_to_client(type)
             payload = self.rfile.read(message_length).decode()
             logging.info(f"Received {method} request, Payload: {payload}") 
             print(f"Payload from Client: {payload}")
