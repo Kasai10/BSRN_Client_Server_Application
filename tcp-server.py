@@ -40,12 +40,13 @@ class request_handler(BaseHTTPRequestHandler):
             message_length = int(self.headers['Content-Length'])
             self.respond_to_client(type)
             payload = self.rfile.read(message_length).decode()
-            logging.info(f"Received {method} request - Path: {self.path}, Payload: {payload}") 
-            self.respond_to_client(method)
-            print
+            logging.info(f"Received {method} request, Payload: {payload}") 
+            print(f"Payload from Client: {payload}")
         except (ValueError, UnicodeDecodeError):  
             logging.error(f"Error processing request: {method}, Path: {self.path}")
             self.send_error(400, "Bad Request")  
+        finally:
+            self.respond_to_client(method)
 
 
     def log_request(self, code='-', size='-'):
