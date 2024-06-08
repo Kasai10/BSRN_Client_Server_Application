@@ -26,7 +26,7 @@ class request_handler(BaseHTTPRequestHandler):
 
             response = json.dumps(f"TCP-Server received {method} request, Payload: {payload}")
             response = response.replace('\\', '').replace('"', '')
-            logging.info(response)
+            logging.info(f"Following message sent to client: {response}")
             self.wfile.write(response.encode())
             print(f"Following message sent to client: {response}")
         except ConnectionResetError:
@@ -42,13 +42,10 @@ class request_handler(BaseHTTPRequestHandler):
         try:
             message_length = int(self.headers['Content-Length'])
             payload = self.rfile.read(message_length).decode()
-            #logging.info(f"TCP-Server received {method} request, Payload: {payload}") 
-            #print(f"Payload from Client: {payload}")
             self.respond_to_client(method, payload)
         except (ValueError, UnicodeDecodeError):  
             logging.error(f"Error processing request: {method}, Path: {self.path}")
             self.send_error(400, "Bad Request")  
-
 
 
     def log_request(self, code='-', size='-'):
