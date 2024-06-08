@@ -35,6 +35,8 @@ class request_handler(BaseHTTPRequestHandler):
         except Exception as e:
             print(f"Error responding to {method} request: {e}")
             self.send_error(500, "Internal Server Error")
+        finally:
+            self.wfile.flush()  # Ensure all data is flushed before closing the connection
         
     def handle_payload(self, method):
         try:
@@ -46,8 +48,7 @@ class request_handler(BaseHTTPRequestHandler):
         except (ValueError, UnicodeDecodeError):  
             logging.error(f"Error processing request: {method}, Path: {self.path}")
             self.send_error(400, "Bad Request")  
-        finally:
-            self.respond_to_client(method, {})
+
 
 
     def log_request(self, code='-', size='-'):
