@@ -22,10 +22,13 @@ class request_handler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header("Content-type", "application/json")
             self.end_headers()
-            response = json.dumps(f"TCP-Server Response: received {method} request for path: {self.path}")
+            response = json.dumps(f"TCP-Server received {method} request")
             logging.info(response)
             self.wfile.write(response.encode())
             print(f"Message sent to client")
+        except ConnectionResetError:
+            logging.error(f"Connection reset by client during {method} request")
+            print(f"Connection reset by client during {method} request")
         except Exception as e:
             print(f"Error responding to {method} request: {e}")
             self.send_error(500, "Internal Server Error")
@@ -39,10 +42,16 @@ class request_handler(BaseHTTPRequestHandler):
             payload = self.rfile.read(message_length).decode()
             logging.info(f"Received {method} request - Path: {self.path}, Payload: {payload}") 
             self.respond_to_client(method)
+            print
         except (ValueError, UnicodeDecodeError):  
             logging.error(f"Error processing request: {method}, Path: {self.path}")
             self.send_error(400, "Bad Request")  
-                     
+
+
+    def log_request(self, code='-', size='-'):
+        logging.info(f"Client IP Address {self.client_address[0]} -  \"{self.requestline}\" ")
+        print(f"Client IP: {self.client_address[0]}  [{self.log_date_time_string()}] \"{self.requestline}\" ")
+
 def start_server():
  
     server_address = ('localhost', 8000)
