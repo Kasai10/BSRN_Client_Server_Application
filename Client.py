@@ -53,7 +53,7 @@ def communicate_with_load_balancer(payload):
         response = receive_response_from_tcp_server(tcp_socket)
         if response is not None:
             print("Response from the TCP server:")
-            print(json.dumps(response, indent=4))
+            print(response)
     except Exception as e:
         print(f"Error communicating to the load balancer: {e}")
     finally:
@@ -62,10 +62,8 @@ def communicate_with_load_balancer(payload):
 
 def receive_response_from_tcp_server(tcp_socket):
     try:
-        response = tcp_socket.recv(4096)
-        decoded_response = json.loads(response.decode())
-        print(json.dumps(decoded_response, indent=4))
-        return decoded_response
+        response = tcp_socket.recv(1024).decode()
+        return response
     except socket.error as e:
         print(f"Error receiving the response from the  TCP server: {e}")
     except json.JSONDecodeError as e:

@@ -10,7 +10,7 @@ SERVER_HOST = "localhost"
 #Very confusing
 SERVERS = {"TCP-Server": [8000, 80, 443], "UDP-Server": 8887}
 
-def connect_to_server(server_port, server_type, rest_data, connect_necessary):
+def connect_to_server(server_port, server_type, rest_data, connect_necessary, client_socket):
     server_socket = socket.socket(socket.AF_INET, server_type)
     server_adress = (SERVER_HOST, server_port)
     data_json = json.dumps(rest_data)
@@ -27,6 +27,13 @@ def connect_to_server(server_port, server_type, rest_data, connect_necessary):
         
         response = conn.getresponse()
         print(f"Response status: {response.status}, reason: {response.reason}")
+        #Test this out
+        body = response.read().decode()
+        message = body.split('\r\n\r\n')[-1]
+        cleaned_message = message.strip('"')
+        print(cleaned_message)
+        client_socket.sendall(cleaned_message.encode())
+        
         conn.close()
     else:
         server_socket.sendto(data_json.encode(),server_adress)
@@ -35,16 +42,16 @@ def connect_to_server(server_port, server_type, rest_data, connect_necessary):
     server_socket.close()
 
 
-def get_server_by_name(server_name, rest_data):
+def get_server_by_name(server_name, rest_data, client_socket):
    
     server_port = SERVERS[server_name][0] #must be changed when I know how the http/https is determined
     
     try:
         match server_name:
             case "TCP-Server":
-                connect_to_server(server_port, socket.SOCK_STREAM, rest_data, True)
+                connect_to_server(server_port, socket.SOCK_STREAM, rest_data, True, client_socket)
             case "UDP-Server":
-                connect_to_server(server_port, socket.SOCK_DGRAM, rest_data, False)
+                connect_to_server(server_port, socket.SOCK_DGRAM, rest_data, False, client_socket)
     except:
         raise Exception(f"Connecting to {server_name} unsuccessfull")
 
@@ -53,7 +60,7 @@ def handle_client_connection(client_socket):
     client_data = client_socket.recv(1024).decode()
     data_dict = json.loads(client_data)
     print("Received data from client:", client_data)
-    get_server_by_name(data_dict.pop("Connect to"),data_dict)
+    get_server_by_name(data_dict.pop("Connect to"),data_dict, client_socket)
     
 
 def receive_from_client():
