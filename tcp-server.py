@@ -4,39 +4,43 @@ import argparse
 import json
 
 class request_handler(BaseHTTPRequestHandler): 
-    def do_GET(self): 
-        self.handle_payload("GET")
+    def do_GET(self, antwort):
+        antwort = "The resource was successfully retrieved." 
+        self.handle_payload("GET") #deutlich machen, dass die Methode verstanden wird
 
-    def do_PUT(self):
+    def do_PUT(self, antwort):
+        antwort = "The resource was successfully updated."
         self.handle_payload("PUT")
 
-    def do_POST(self):
+    def do_POST(self, antwort):
+        antwort = "New resource successfully created."
         self.handle_payload("POST")
 
-    def do_DELETE(self):
+    def do_DELETE(self, antwort):
+        antwort = "The resource was successfully deleted."
         self.handle_payload("DELETE")
 
-    def handle_payload(self, method):
+    def handle_payload(self, method, antwort):
         try:
             if method in ['PUT', 'POST']:
                 message_length = int(self.headers['Content-Length'])
                 payload = self.rfile.read(message_length).decode()
-                self.respond_to_client(method, payload)
+                self.respond_to_client(method, payload, antwort)
             else:
                 payload = f"Message: none, Method: {method}"
-                self.respond_to_client(method, payload)
+                self.respond_to_client(method, payload, antwort)
         except (ValueError, UnicodeDecodeError):  
             logging.error(f"Error processing request: {method}, Path: {self.path}")
             self.send_error(400, "Bad Request") 
 
-    def respond_to_client(self, method, payload):
+    def respond_to_client(self, method, payload, antwort):
         try:
-            print(f"Incoming message from Client")
+            print(f"Incoming {method} message from Client")
             self.send_response(200)
             self.send_header("Content-type", "application/json")
             self.end_headers()
 
-            response = json.dumps(f"TCP-Server received request, Payload: {payload}")
+            response = json.dumps(f"TCP-Server received following request: {payload} \nAntwort: {antwort}")
             response = response.replace('\\', '').replace('"', '')
             logging.info(f"Following message sent to client: {response}")
             self.wfile.write(response.encode())
@@ -55,7 +59,7 @@ class request_handler(BaseHTTPRequestHandler):
 
     def log_request(self, code='-', size='-'):
         logging.info(f"Request currently being handled: Client IP Address {self.client_address[0]}, Type: {self.requestline}")
-        print(f"[{self.log_date_time_string()}] Client IP: {self.client_address[0]}, Request details: {self.requestline} ")
+        print(f"[{self.log_date_time_string()}] Request currently being handled: Client IP Address: {self.client_address[0]}, Request details: {self.requestline} ")
 
 def start_server():
  
