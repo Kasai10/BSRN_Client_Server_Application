@@ -71,7 +71,7 @@ def communicate_with_load_balancer(payload, server_type):
 
 def receive_response_from_tcp_server(tcp_socket):
     try:
-        response = tcp_socket.recv(1024).decode
+        response = tcp_socket.recv(1024).decode()
         return response
     except socket.error as e:
         print(f"Error receiving the response from the  TCP server: {e}")
