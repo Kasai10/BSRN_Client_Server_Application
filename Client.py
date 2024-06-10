@@ -1,13 +1,20 @@
 import socket
 import json
 
-LOAD_BALANCER_HOST = "localhost"
 LOAD_BALANCER_PORT = 9999
 UDP_SERVER_PORT = 8887
 BUFFER_SIZE = 4096
 
 def print_header(header):
     print(f"\n--- {header} ---\n")
+
+
+def choose_host():
+    host = input("Choose a host. Press Enter for default localhost or enter the load balancer IP address: ").strip()
+    if not host:
+        return "localhost"
+    else:
+        return host
 
 
 def get_server_type():
@@ -31,6 +38,7 @@ def get_http_method(server_type):
           
 
 def get_payload():
+    load_balancer_host = choose_host()
     server_type = get_server_type()
     method = get_http_method(server_type)
     message = ""
@@ -38,22 +46,27 @@ def get_payload():
     if method not in ["GET", "DELETE"]:
         message = input("Enter the message: ")
 
-    payload = json.dumps({"Connect to": server_type, "Message": message, "Method": method})
-    return payload, server_type
+    payload = json.dumps({
+        "IP Address": load_balancer_host,
+        "Connect to": server_type,
+        "Message": message,
+        "Method": method
+    })
+    return payload, server_type, load_balancer_host
 
 
 def send_message():
     try:
-        payload, server_type  = get_payload()
-        communicate_with_load_balancer(payload, server_type)
+        payload, server_type, load_balancer_host = get_payload()
+        communicate_with_load_balancer(payload, server_type, load_balancer_host)
     except Exception as e:
         print(f"An error has occurred: {e}")
 
 
-def communicate_with_load_balancer(payload, server_type):
+def communicate_with_load_balancer(payload, server_type, load_balancer_host):
     try:
         tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        tcp_socket.connect((LOAD_BALANCER_HOST, LOAD_BALANCER_PORT))
+        tcp_socket.connect((load_balancer_host, LOAD_BALANCER_PORT))
         tcp_socket.sendall(payload.encode())
         print("[INFO] Payload sent to the load balancer.")
 
