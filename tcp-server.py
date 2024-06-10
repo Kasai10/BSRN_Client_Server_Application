@@ -25,10 +25,10 @@ class request_handler(BaseHTTPRequestHandler):
             if method in ['PUT', 'POST']:
                 message_length = int(self.headers['Content-Length'])
                 payload = self.rfile.read(message_length).decode()
-                self.respond_to_client(method, payload)
+                self.respond_to_client(method, payload, antwort)
             else:
                 payload = f"Message: none, Method: {method}"
-                self.respond_to_client(method, payload)
+                self.respond_to_client(method, payload, antwort)
         except (ValueError, UnicodeDecodeError):  
             logging.error(f"Error processing request: {method}, Path: {self.path}")
             self.send_error(400, "Bad Request") 
