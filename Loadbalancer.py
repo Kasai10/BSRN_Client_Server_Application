@@ -4,7 +4,7 @@ import json
 import http.client
 
 LOAD_BALANCER_HOST = "localhost"
-LOAD_BALANCER_PORT = 9999
+LOAD_BALANCER_PORT = 8888
 SERVER_HOST = "localhost"
 
 SERVERS = {"TCP-Server": 8000, "UDP-Server": 8887}
