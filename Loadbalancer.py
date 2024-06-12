@@ -3,7 +3,7 @@ import threading
 import json
 import http.client
 
-LOAD_BALANCER_HOST = "localhost"
+LOAD_BALANCER_HOST = "0.0.0.0"
 LOAD_BALANCER_PORT = 8888
 SERVER_HOST = "localhost"
 
