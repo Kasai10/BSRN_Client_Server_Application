@@ -20,7 +20,7 @@ def connect_to_server(server_port, server_type, rest_data, connect_necessary, cl
             headers = {'Content-type': 'application/json'}
             method = rest_data.pop('Method')
 
-            if method == 'GET':
+            if method == 'GET' | method == "DELETE":
                 conn.request(method, '/', headers=headers)
             else:
                 conn.request(method, '/', body=data_json, headers=headers)
@@ -56,7 +56,7 @@ def get_server_by_name(server_name, rest_data, client_socket):
     except Exception as e:
         print(f"Connecting to {server_name} unsuccessful: {e}")
 
-def handle_client_connection(client_socket, client_thread):
+def handle_client_connection(client_socket):
     try:
         client_data = client_socket.recv(1024).decode()
         data_dict = json.loads(client_data)
@@ -66,7 +66,7 @@ def handle_client_connection(client_socket, client_thread):
         print(f"Error handling client connection: {e}")
     finally:
         client_socket.close()
-        client_thread.close()
+
         
 
 def receive_from_client():
@@ -79,7 +79,7 @@ def receive_from_client():
     while True:
         client_socket, client_address = load_balancer_socket.accept()
         print(f"Accepted connection from {client_address}")
-        client_thread = threading.Thread(target=handle_client_connection, args=(client_socket,client_thread))
+        client_thread = threading.Thread(target=handle_client_connection, args=(client_socket,))
         client_thread.start()
 
 receive_from_client()
