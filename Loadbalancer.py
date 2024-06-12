@@ -20,7 +20,7 @@ def connect_to_server(server_port, server_type, rest_data, connect_necessary, cl
             headers = {'Content-type': 'application/json'}
             method = rest_data.pop('Method')
 
-            if method == 'GET' | method == "DELETE":
+            if method == 'GET' or method == "DELETE":
                 conn.request(method, '/', headers=headers)
             else:
                 conn.request(method, '/', body=data_json, headers=headers)
