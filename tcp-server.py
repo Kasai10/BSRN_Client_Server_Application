@@ -40,7 +40,7 @@ class request_handler(BaseHTTPRequestHandler):
             self.send_header("Content-type", "application/json")
             self.end_headers()
 
-            response = (f"TCP-Server received following request: \n-Message:  {payload["Message"]} \n-Method: {payload["Method"]} \n- {antwort}")
+            response = (f"TCP-Server received following request: \n-Message:  {payload['Message']} \n-Method: {payload['Method']} \n- {antwort}")
             logging.info(f"Following message sent to client: \n{response}")
             self.wfile.write(response.encode())
             print(f"Following message sent to client: {response}")
