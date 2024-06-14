@@ -15,15 +15,15 @@ def server(port): #hier mach ich den Port als parameter mal lieber in eine funkt
         print("Benachrichtigung eines neuen erstellten sockets")
         logging.info ("Ein neues Socket wurde erstellt") #Für die bessere Übersicht dann einfach nh response, dass das Socket erstellt worden ist, wenn alles glatt läuft
     except Exception as socketfehler:
-        logging.error("Das Erstellen des Sockets mit Port : {Port} hat nicht funktioniert")
+        logging.error(f"Das Erstellen des Sockets mit Port : {port} hat nicht funktioniert")
         return
     try:
         adresse=('localhost', port) #Hier deklariere ich eine neue variable, die einfach die server adresse ist. Port wie gesagt, die portnummer, die in der funktion vom user deklariert wird und dann ein leerer string, wodurch dann alle IP-Adressen eine Verbindung zum Server aufbauen können. Ausserdem ist ein Tupel hier glaube ich erforderlich, weil die methode bind soweit ich weiss nur bei tupel funktioniert
         socket1.bind(adresse) #Damit das Betriebssystem dann weiss, dass alle packets, die an dem vom user gegebenen Ports gesendet werden auch an das Socket weitergeschickt werden sollen.
-        logging.info("Socket wurde an die Adresse {adresse} gebunden")
+        logging.info(f"Socket wurde an die Adresse {adresse} gebunden")
         print("Benachrichtigung, dass das socket an die adresse gebindet wurde")
     except Exception as bindfehlgeschlagen:
-         logging.error("Das Binden des Sockets hat nicht geklappt")
+         logging.error(f"Das Binden des Sockets an die Adresse {adresse} hat nicht geklappt")
          return
     
     while True: #Hier geht es dann in die Schleife, wodurch der Server dann permanent auf eine neue Nachricht warten kann.  
@@ -50,9 +50,10 @@ def server(port): #hier mach ich den Port als parameter mal lieber in eine funkt
                 logging.error("Die Json-Antwort konnte nicht erstellt werden")
                 jsonantwort=json.dumps({"status": "error", "message": "Antwort konnte nicht erstellt werden"})   
         try:
-            socket1.sendto(jsonantowrt.encode(), adresseclient) 
+            loadbalanceradresse = ('localhost', 8888)
+            socket1.sendto(jsonantwort.encode(), loadbalanceradresse) 
             print("Die nachricht sollte nun versendet worden sein an den Client")
-            logging.info("Die Antwort {jsonantowrt} wurden an {adresseclient} gesendet")
+            logging.info(f"Die Antwort {jsonantwort} wurden an {loadbalanceradresse} gesendet")
         except Exception as sendefehler:
             logging.error("Die Antwort konnte nicht versendet werden")    
             
