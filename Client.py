@@ -64,22 +64,25 @@ def send_message():
 
 
 def communicate_with_load_balancer(payload, server_type, load_balancer_host):
+    tcp_socket = None
     try:
         tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         tcp_socket.connect((load_balancer_host, LOAD_BALANCER_PORT))
         tcp_socket.sendall(payload.encode())
         print("[INFO] Payload sent to the load balancer.")
 
-        response = receive_response_from_tcp_server(tcp_socket)
-        if response is not None:
-            print("[INFO] Response from the TCP server:")
-            print(response)
-        if "UDP" in server_type:
+        if "TCP" in server_type:
+            response = receive_response_from_tcp_server(tcp_socket)
+            if response is not None:
+                print("[INFO] Response from the TCP server:")
+                print(response)
+        elif "UDP" in server_type:
             receive_response_from_udp_server()
     except Exception as e:
         print(f"Payload couldn't be sent to the load balancer: {e}")
     finally:
-        tcp_socket.close()
+        if tcp_socket:
+           tcp_socket.close()
 
 
 def receive_response_from_tcp_server(tcp_socket):
