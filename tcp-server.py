@@ -3,7 +3,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import argparse
 import json
 
-class requestHandler(BaseHTTPRequestHandler): 
+class RequestHandler(BaseHTTPRequestHandler): 
     def do_GET(self):
         self.handle_payload("GET", "The resource was successfully retrieved.")
 
@@ -34,16 +34,14 @@ class requestHandler(BaseHTTPRequestHandler):
     def respond_to_client(self, method, response_message, payload):
         try:
             logging.info(f"Incoming {method} message from Client")
-            print(f"{method} Message recieved from Client")
+            print(f"{method} message recieved from Client")
             self.send_response(200)
             self.send_header("Content-type", "application/json")
             self.end_headers()
-            response = (f"TCP-Server received following request: \n{payload} \n{response_message}")
+            response = f"TCP-Server received following request: \n{payload} \n{response_message}"
             self.wfile.write(response.encode())
-
-            sent_info = f"Following message sent to client: \n{response}"
-            logging.info(sent_info)
-            print(response_message)
+            logging.info(f"Following message sent to client: \n{response}")
+            print(f"response_message\n")
         except ConnectionResetError:
             logging.error(f"Connection reset by client during {method} request")
             self.send_error(500, "Connection reset by client")
@@ -52,7 +50,7 @@ class requestHandler(BaseHTTPRequestHandler):
             self.send_error(500, "Internal Server Error")
         finally:
             self.wfile.flush()  # Ensure all data is flushed before closing the connection
-            print("")
+            
            
  
     def log_request(self, code='-', size='-'):
@@ -60,7 +58,7 @@ class requestHandler(BaseHTTPRequestHandler):
 
 def start_server():
     server_address = ('localhost', 8000)
-    httpd = HTTPServer(server_address, requestHandler)
+    httpd = HTTPServer(server_address, RequestHandler)
     start_info = f"TCP server has started on port 8000"
     logging.info(start_info)
     print(start_info)
@@ -79,7 +77,7 @@ def start_server():
 
 def start_logging(log_file_path=None):
     logging.basicConfig(filename=log_file_path, level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
-    logging.info(f"TCP Server started logging")
+    logging.info("TCP Server started logging")
     
 
 if __name__ == "__main__":
