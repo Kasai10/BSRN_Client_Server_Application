@@ -3,7 +3,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import argparse
 import json
 
-class request_handler(BaseHTTPRequestHandler): 
+class requestHandler(BaseHTTPRequestHandler): 
     def do_GET(self):
         self.handle_payload("GET", "The resource was successfully retrieved.")
 
@@ -28,14 +28,13 @@ class request_handler(BaseHTTPRequestHandler):
 
             self.respond_to_client(method, response_message, payload)
         except (ValueError, UnicodeDecodeError, json.JSONDecodeError) as e:  
-            error_info = f"Error processing {method} request: {e}"
-            logging.error(error_info)
-            print(error_info)
+            logging.error(f"Error processing {method} request: {e}")
             self.send_error(400, "Bad Request") 
 
     def respond_to_client(self, method, response_message, payload):
         try:
-            print(f"Incoming {method} message from Client")
+            logging.info(f"Incoming {method} message from Client")
+            print(f"{method} Message recieved from Client")
             self.send_response(200)
             self.send_header("Content-type", "application/json")
             self.end_headers()
@@ -44,16 +43,12 @@ class request_handler(BaseHTTPRequestHandler):
 
             sent_info = f"Following message sent to client: \n{response}"
             logging.info(sent_info)
-            print(sent_info)
+            print(response_message)
         except ConnectionResetError:
-            error_info = f"Connection reset by client during {method} request"
-            logging.error(error_info)
-            print(error_info)
+            logging.error(f"Connection reset by client during {method} request")
             self.send_error(500, "Connection reset by client")
         except Exception as e:
-            error_info = f"Error responding to {method} request: {e}"
-            logging.error(error_info)
-            print(error_info)
+            logging.error(f"Error responding to {method} request: {e}")
             self.send_error(500, "Internal Server Error")
         finally:
             self.wfile.flush()  # Ensure all data is flushed before closing the connection
@@ -61,13 +56,11 @@ class request_handler(BaseHTTPRequestHandler):
            
  
     def log_request(self, code='-', size='-'):
-        status_info = f"Request currently being handled: \n- Client IP Address: {self.client_address[0]} \n- Request details: {self.requestline}"
-        logging.info(status_info)
-        print(status_info)
+        logging.info(f"Request currently being handled: \n- Client IP Address: {self.client_address[0]} \n- Request details: {self.requestline}")
 
 def start_server():
     server_address = ('localhost', 8000)
-    httpd = HTTPServer(server_address, request_handler)
+    httpd = HTTPServer(server_address, requestHandler)
     start_info = f"TCP server has started on port 8000"
     logging.info(start_info)
     print(start_info)
@@ -78,20 +71,15 @@ def start_server():
     except KeyboardInterrupt:
         pass
     except (OSError) as e:
-        error_status = f"Server startup error: {e}"
-        logging.error(error_status)
-        print(error_status)
+        logging.error(f"Server startup error: {e}")
     finally:
         httpd.server_close()
-        close_info = f"TCP Server is closed"    
-        print(close_info)
-        logging.info(close_info)
+        logging.info(f"TCP Server is closed")   
+
 
 def start_logging(log_file_path=None):
     logging.basicConfig(filename=log_file_path, level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
-    start_info = "TCP Server started logging"
-    logging.info(start_info)
-    print(start_info)
+    logging.info(f"TCP Server started logging")
     
 
 if __name__ == "__main__":
