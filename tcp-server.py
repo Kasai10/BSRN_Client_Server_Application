@@ -7,17 +7,19 @@ class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.handle_payload("GET", "The resource was successfully retrieved.")
 
-    def do_PUT(self):
-        self.handle_payload("PUT", "The resource was successfully updated.")
-
     def do_POST(self):
         self.handle_payload("POST", "New resource successfully created.")
+
+    def do_PUT(self):
+        self.handle_payload("PUT", "The resource was successfully updated.")
 
     def do_DELETE(self):
         self.handle_payload("DELETE", "The resource was successfully deleted.")
 
     def handle_payload(self, method, response_message):
         try:
+            logging.info(f"Incoming {method} message from Client")
+            print(f"{method} message recieved from Client")
             if method in ['PUT', 'POST']:
                 message_length = int(self.headers['Content-Length'])
                 payload_json = self.rfile.read(message_length).decode()
@@ -33,15 +35,13 @@ class RequestHandler(BaseHTTPRequestHandler):
 
     def respond_to_client(self, method, response_message, payload):
         try:
-            logging.info(f"Incoming {method} message from Client")
-            print(f"{method} message recieved from Client")
             self.send_response(200)
-            self.send_header("Content-type", "application/json")
+            self.send_header("Content-type", "text/plain")
             self.end_headers()
             response = f"TCP-Server received following request: \n{payload} \n{response_message}"
             self.wfile.write(response.encode())
             logging.info(f"Following message sent to client: \n{response}")
-            print(f"response_message\n")
+            print(f"{response_message}\n")
         except ConnectionResetError:
             logging.error(f"Connection reset by client during {method} request")
             self.send_error(500, "Connection reset by client")
@@ -50,8 +50,6 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.send_error(500, "Internal Server Error")
         finally:
             self.wfile.flush()  # Ensure all data is flushed before closing the connection
-            
-           
  
     def log_request(self, code='-', size='-'):
         logging.info(f"Request currently being handled: \n- Client IP Address: {self.client_address[0]} \n- Request details: {self.requestline}")
@@ -65,16 +63,17 @@ def start_server():
 
     try:
         httpd.serve_forever()
-        
     except KeyboardInterrupt:
-        pass
+        logging.info("Server shutdown initiated by user")
     except (OSError) as e:
         logging.error(f"Server startup error: {e}")
+    except Exception as e:
+        logging.error(f"Unexpected error during server startup: {e}")
     finally:
         httpd.server_close()
         logging.info(f"TCP Server is closed")   
 
-
+ 
 def start_logging(log_file_path=None):
     logging.basicConfig(filename=log_file_path, level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
     logging.info("TCP Server started logging")
