@@ -1,7 +1,7 @@
 import socket
 import json
 
-LOAD_BALANCER_PORT = 9999
+LOAD_BALANCER_PORT = 8888
 UDP_SERVER_PORT = 8887
 BUFFER_SIZE = 4096
 
@@ -64,25 +64,22 @@ def send_message():
 
 
 def communicate_with_load_balancer(payload, server_type, load_balancer_host):
-    tcp_socket = None
     try:
         tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         tcp_socket.connect((load_balancer_host, LOAD_BALANCER_PORT))
         tcp_socket.sendall(payload.encode())
         print("[INFO] Payload sent to the load balancer.")
 
-        if "TCP" in server_type:
-            response = receive_response_from_tcp_server(tcp_socket)
-            if response is not None:
-                print("[INFO] Response from the TCP server:")
-                print(response)
-        elif "UDP" in server_type:
+        response = receive_response_from_tcp_server(tcp_socket)
+        if response is not None:
+            print("[INFO] Response from the TCP server:")
+            print(response)
+        if "UDP" in server_type:
             receive_response_from_udp_server()
     except Exception as e:
         print(f"Payload couldn't be sent to the load balancer: {e}")
     finally:
-        if tcp_socket:
-           tcp_socket.close()
+        tcp_socket.close()
 
 
 def receive_response_from_tcp_server(tcp_socket):
@@ -126,7 +123,3 @@ if __name__ == "__main__":
         else:
             print_header("Program Ended")
             break
-
-        
-        
-        
