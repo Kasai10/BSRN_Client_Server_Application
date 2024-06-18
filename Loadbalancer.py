@@ -39,7 +39,7 @@ def connect_to_server(server_port, server_type, rest_data, connect_necessary, cl
             conn.close()
         else:
             server_socket.sendto(data_json.encode(), server_address)
-
+            print(f"Data sucessfully send to Server: {data_json}")
             # Wait for the response from the UDP server
             response, server = server_socket.recvfrom(4096)
             response_message = response.decode()
@@ -74,8 +74,6 @@ def handle_client_connection(client_socket):
         print(f"Error handling client connection: {e}")
     finally:
         client_socket.close()
-
-        
 
 def receive_from_client():
     load_balancer_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

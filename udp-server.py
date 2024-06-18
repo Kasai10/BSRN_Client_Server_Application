@@ -50,10 +50,9 @@ def server(port): #hier mach ich den Port als parameter mal lieber in eine funkt
                 logging.error("Die Json-Antwort konnte nicht erstellt werden")
                 jsonantwort=json.dumps({"status": "error", "message": "Antwort konnte nicht erstellt werden"})   
         try:
-            loadbalanceradresse = ('localhost', 8888)
-            socket1.sendto(jsonantwort.encode(), loadbalanceradresse) 
+            socket1.sendto(jsonantwort.encode(), adresseclient) 
             print("Die nachricht sollte nun versendet worden sein an den Client")
-            logging.info(f"Die Antwort {jsonantwort} wurden an {loadbalanceradresse} gesendet")
+            logging.info(f"Die Antwort {jsonantwort} wurden an {adresseclient} gesendet")
         except Exception as sendefehler:
             logging.error("Die Antwort konnte nicht versendet werden") 
             print(sendefehler)   
