@@ -2,8 +2,7 @@ import socket
 import json
 
 LOAD_BALANCER_PORT = 8888
-UDP_SERVER_PORT = 8887
-BUFFER_SIZE = 4096
+
 
 def print_header(header):
     print(f"\n--- {header} ---\n")
@@ -64,53 +63,31 @@ def send_message():
 
 
 def communicate_with_load_balancer(payload, server_type, load_balancer_host):
+    tcp_socket = None
     try:
         tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         tcp_socket.connect((load_balancer_host, LOAD_BALANCER_PORT))
         tcp_socket.sendall(payload.encode())
         print("[INFO] Payload sent to the load balancer.")
 
-        response = receive_response_from_tcp_server(tcp_socket)
-        if response is not None:
-            print("[INFO] Response from the TCP server:")
-            print(response)
-        if "UDP" in server_type:
-            receive_response_from_udp_server()
-    except Exception as e:
-        print(f"Payload couldn't be sent to the load balancer: {e}")
-    finally:
-        tcp_socket.close()
-
-
-def receive_response_from_tcp_server(tcp_socket):
-    try:
         response = tcp_socket.recv(1024).decode()
-        return response
+        if response:
+            if "TCP" in server_type:
+                print("[INFO] Response from the TCP server:")
+            elif "UDP" in server_type:
+                print("[INFO] Response from the UDP server:")
+            print(response)
+        else:
+            print("[ERROR] No response received from the server.")
+     
     except socket.error as e:
-        print(f"Error receiving the response from the TCP server: {e}")
-
-
-def receive_response_from_udp_server():
-    udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    udp_socket.bind(('', UDP_SERVER_PORT))
-    print(f"Listening for UDP response on port {UDP_SERVER_PORT}...")
-
-    try:
-        while True:
-            message, server_address = udp_socket.recvfrom(BUFFER_SIZE)
-            decoded_message = message.decode()
-            try:
-                json_response = json.loads(decoded_message)
-                print(f"[INFO] Response from the UDP server:")
-                print(json.dumps(json_response))
-            except json.JSONDecodeError as e:
-                print(f"Error decoding the JSON response: {e}")
-                
-
-    except socket.error as e:
-        print(f"Error receiving the response from the UDP server: {e}")
+        print(f"[ERROR] Socket error: {e} ")
+    except Exception as e:
+        print(f"[ERROR] Failed to communicate to the load balancer: {e}")
     finally:
-        udp_socket.close()
+        if tcp_socket:
+            tcp_socket.close()
+
     
 
 if __name__ == "__main__":
@@ -118,8 +95,6 @@ if __name__ == "__main__":
     while True:   
         send_message()
         continue_sending_requests = input("\nDo you want to send another request (yes/no)? ").strip().lower()
-        if continue_sending_requests == "yes":
-            print("\n")
-        else:
+        if continue_sending_requests != "yes":
             print_header("Program Ended")
             break
