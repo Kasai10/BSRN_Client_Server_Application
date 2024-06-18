@@ -39,6 +39,14 @@ def connect_to_server(server_port, server_type, rest_data, connect_necessary, cl
             conn.close()
         else:
             server_socket.sendto(data_json.encode(), server_address)
+
+            # Wait for the response from the UDP server
+            response, server = server_socket.recvfrom(4096)
+            response_message = response.decode()
+            print(f"Received response from server: {response_message}")
+
+            # Send the response back to the client
+            client_socket.sendall(response_message.encode())
         
     except Exception as e:
         print(f"Error connecting to server: {e}")

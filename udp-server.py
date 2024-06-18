@@ -48,10 +48,11 @@ def server(port): #hier mach ich den Port als parameter mal lieber in eine funkt
                 logging.error("Die Json-Antwort konnte nicht erstellt werden")
                 jsonantwort=json.dumps({"status": "error", "message": "Antwort konnte nicht erstellt werden"})   
         try:
-            socket1.sendto(antwort.encode(), adresseclient) 
+            socket1.sendto(jsonantwort.encode(), adresseclient) 
             logging.info("Die Antwort {jsonantowrt} wurden an {adresseclient} gesendet")
         except Exception as sendefehler:
-            logging.error("Die Antwort konnte nicht versendet werden")    
+            logging.error("Die Antwort konnte nicht versendet werden") 
+            print(sendefehler)   
             
 if __name__=="__main__": #Das hier ist quasi eine Sicherheitsvorkehrung dass das Skript hier nur in bestimmten massen ausgeführt wird, damit mien code nicht einfach startet ohne beispielsweise eine portnummer zu haben
     argumentparser = argparse.ArgumentParser(description="UDP-Server")
