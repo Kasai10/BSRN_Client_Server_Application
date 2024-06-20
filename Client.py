@@ -2,16 +2,13 @@ import socket
 import json
 
 LOAD_BALANCER_PORT = 8888
-
-
-def print_header(header):
-    print(f"\n--- {header} ---\n")
+LOAD_BALANCER_HOST = "localhost"
 
 
 def choose_host():
     host = input("Choose a host. Press Enter for default localhost or enter the load balancer IP address: ").strip()
     if not host:
-        return "localhost"
+        return LOAD_BALANCER_HOST
     else:
         return host
 
@@ -54,16 +51,7 @@ def get_payload():
     return payload, server_type, load_balancer_host
 
 
-def send_message():
-    try:
-        payload, server_type, load_balancer_host = get_payload()
-        communicate_with_load_balancer(payload, server_type, load_balancer_host)
-    except Exception as e:
-        print(f"An error has occurred: {e}")
-
-
 def communicate_with_load_balancer(payload, server_type, load_balancer_host):
-    tcp_socket = None
     try:
         tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         tcp_socket.connect((load_balancer_host, LOAD_BALANCER_PORT))
@@ -82,19 +70,21 @@ def communicate_with_load_balancer(payload, server_type, load_balancer_host):
      
     except socket.error as e:
         print(f"[ERROR] Socket error: {e} ")
-    except Exception as e:
-        print(f"[ERROR] Failed to communicate to the load balancer: {e}")
     finally:
-        if tcp_socket:
             tcp_socket.close()
 
-    
+def send_message():
+    try:
+        payload, server_type, load_balancer_host = get_payload()
+        communicate_with_load_balancer(payload, server_type, load_balancer_host)
+    except Exception as e:
+        print(f"An error has occurred: {e}")
 
-if __name__ == "__main__":
-    print_header("Client Application Started")
-    while True:   
-        send_message()
-        continue_sending_requests = input("\nDo you want to send another request (yes/no)? ").strip().lower()
-        if continue_sending_requests != "yes":
-            print_header("Program Ended")
-            break
+
+print("\n--- Client Started ---\n")
+while True:   
+    send_message()
+    continue_sending_requests = input("\nDo you want to send another request (yes/no)? ").strip().lower()
+    if continue_sending_requests != "yes":
+        print("\n--- Program Ended ---\n")
+        break
