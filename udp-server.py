@@ -39,23 +39,15 @@ def server(port): #hier mach ich den Port als parameter mal lieber in eine funkt
         except Exception as Dekodierungsfehler:
                    logging.error("Die nachricht konnte nicht entschlüsselt werden")
                    continue
-        antwort = {
-                "status":"success",
-                "message":"Ihre Nachricht wurde entgegengenommen",
-                "data": konkretenachricht
-                } 
+        antwort = f"status:success, message: Ihre Nachricht wurde entgegengenommen,data: {konkretenachricht}"
+                
         try:
-                jsonantwort = json.dumps(antwort)
-        except Exception as Jsonantowrtfehler:
-                logging.error("Die Json-Antwort konnte nicht erstellt werden")
-                jsonantwort=json.dumps({"status": "error", "message": "Antwort konnte nicht erstellt werden"})   
-        try:
-            socket1.sendto(jsonantwort.encode(), adresseclient) 
+            loadbalanceradresse = ('localhost', 8888)
+            socket1.sendto(antwort.encode(), adresseclient) 
             print("Die nachricht sollte nun versendet worden sein an den Client")
-            logging.info(f"Die Antwort {jsonantwort} wurden an {adresseclient} gesendet")
+            logging.info(f"Die Antwort {antwort} wurden an {adresseclient} gesendet")
         except Exception as sendefehler:
-            logging.error("Die Antwort konnte nicht versendet werden") 
-            print(sendefehler)   
+            logging.error("Die Antwort konnte nicht versendet werden")    
             
 if __name__=="__main__": #Das hier ist quasi eine Sicherheitsvorkehrung dass das Skript hier nur in bestimmten massen ausgeführt wird, damit mien code nicht einfach startet ohne beispielsweise eine portnummer zu haben
     argumentparser = argparse.ArgumentParser(description="UDP-Server")
