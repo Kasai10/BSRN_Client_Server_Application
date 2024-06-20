@@ -4,7 +4,7 @@ import json
 LOAD_BALANCER_PORT = 8888
 LOAD_BALANCER_HOST = "localhost"
 
-
+#Prompt the user to choose a host and return the chosen host
 def choose_host():
     host = input("Choose a host. Press Enter for default localhost or enter the load balancer IP address: ").strip()
     if not host:
@@ -12,7 +12,7 @@ def choose_host():
     else:
         return host
 
-
+#Prompt the user to choose a server and return the selected server
 def get_server_type():
     while True:
         server_type = input("Choose a server (TCP or UDP): ").strip().upper()
@@ -21,7 +21,7 @@ def get_server_type():
         else:
             print("Invalid input. Please choose either TCP or UDP.")
 
-
+#Prompt the user to choose an HTTP method if the TCP server was selected
 def get_http_method(server_type):
     if server_type == "UDP-Server":
      return ""
@@ -32,7 +32,7 @@ def get_http_method(server_type):
         else:
             print("Invalid input. Please choose either GET, PUT, POST or DELETE. ")
           
-
+#Creates and returns the JSON-encoded payload, server type and load balancer host
 def get_payload():
     load_balancer_host = choose_host()
     server_type = get_server_type()
@@ -50,7 +50,7 @@ def get_payload():
     })
     return payload, server_type, load_balancer_host
 
-
+#Initiates a connection to the load balancer, sends the payload and prints the responses
 def communicate_with_load_balancer(payload, server_type, load_balancer_host):
     try:
         tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -67,21 +67,22 @@ def communicate_with_load_balancer(payload, server_type, load_balancer_host):
             print(response)
         else:
             print("[ERROR] No response received from the server.")
-     
     except socket.error as e:
         print(f"[ERROR] Socket error: {e} ")
     finally:
             tcp_socket.close()
 
+#Manages the sending of the message to the load balancer based on user inputs
 def send_message():
     try:
         payload, server_type, load_balancer_host = get_payload()
         communicate_with_load_balancer(payload, server_type, load_balancer_host)
     except Exception as e:
-        print(f"An error has occurred: {e}")
+        print(f"[ERROR] Payload could not be sent to the load balancer: {e}")
 
-
+#Main program
 print("\n--- Client Started ---\n")
+#Loop to send messages until the user chooses to stop
 while True:   
     send_message()
     continue_sending_requests = input("\nDo you want to send another request (yes/no)? ").strip().lower()
