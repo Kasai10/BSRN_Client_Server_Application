@@ -1,12 +1,9 @@
 import socket #Die bibliothek brauche ich natürlich um Zugriff auf Netzwerksockets zu erhalten und einen Netzwerkserver zu erstellen.
 import logging #Damit ein feedback zum client via file entsteht
 import argparse
-def loggingfunction(log_file_path=None):
-    if log_file_path:
+def loggingfunction(log_file_path):
         logging.basicConfig(filename=log_file_path, level=logging.INFO, format='%(asctime)s%(levelname)s%(message)s')
         logging.info("UDP Server startet")
-    else:
-        logging.basicConfig(level=logging.INFO, format='%(asctime)s%(levelname)s%(message)s')   
 def server(port): #hier mach ich den Port als parameter mal lieber in eine funktion um das ganze dynamischer und bisschen ordentlicher zu gestalten 
     buffersize = 4096 # Hier wird dann die Buffer size deklariert in höhe von 4096 bytes, da dies eine standartmässige verwendung für UDP Datagramme hat und ich die Puffregrösse definitv auch für die recvform methode brauchen werde
     try:
