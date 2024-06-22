@@ -1,6 +1,5 @@
 import socket #Die bibliothek brauche ich natürlich um Zugriff auf Netzwerksockets zu erhalten und einen Netzwerkserver zu erstellen.
 import logging #Damit ein feedback zum client via file entsteht
-import json #Nachrichtenformat
 import argparse
 def loggingfunction(log_file_path=None):
     if log_file_path:
