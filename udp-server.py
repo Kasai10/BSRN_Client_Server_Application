@@ -26,10 +26,9 @@ def server(port): #hier mach ich den Port als parameter mal lieber in eine funkt
         except Exception as nachrichtempfangen:
                 logging.error("Die Nachricht konnte nicht Empfangen werden")
                 continue
-
         try:    
                     konkretenachricht = nachricht.decode() #Hier wird die nachricht dann decodiert, weil sie normalerweise als Binärdaten empfangen wird.
-                    logging.info(f"Empfangene Nachricht von {adressloadbalancer}: {nachricht.decode()}") 
+                    logging.info(f"Empfangene Nachricht von {adressloadbalancer}: {konkretenachricht}") 
         except Exception as Dekodierungsfehler:
                    logging.error("Die nachricht konnte nicht entschlüsselt werden")
                    continue
