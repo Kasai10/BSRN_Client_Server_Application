@@ -24,24 +24,23 @@ def server(port): #hier mach ich den Port als parameter mal lieber in eine funkt
     
     while True: #Hier geht es dann in die Schleife, wodurch der Server dann permanent auf eine neue Nachricht warten kann.  
         try:
-                nachricht, adresseclient = socket1.recvfrom(buffersize) #Hier ist eine Methode, die quasi den Code anhält und unterbricht, bis eine Nachricht ankommt. Bisher nur als Bytearray
+                nachricht, adressloadbalancer = socket1.recvfrom(buffersize) #Hier ist eine Methode, die quasi den Code anhält und unterbricht, bis eine Nachricht ankommt. Bisher nur als Bytearray
         except Exception as nachrichtempfangen:
                 logging.error("Die Nachricht konnte nicht Empfangen werden")
                 continue
 
         try:    
                     konkretenachricht = nachricht.decode() #Hier wird die nachricht dann decodiert, weil sie normalerweise als Binärdaten empfangen wird.
-                    logging.info(f"Empfangene Nachricht von {adresseclient}: {nachricht.decode()}") 
+                    logging.info(f"Empfangene Nachricht von {adressloadbalancer}: {nachricht.decode()}") 
         except Exception as Dekodierungsfehler:
                    logging.error("Die nachricht konnte nicht entschlüsselt werden")
                    continue
         antwort = f"status:success, message: Ihre Nachricht wurde entgegengenommen,data: {konkretenachricht}"
                 
         try:
-            loadbalanceradresse = ('localhost', 8888)
-            socket1.sendto(antwort.encode(), adresseclient) 
+            socket1.sendto(antwort.encode(), adressloadbalancer) 
             print("Die nachricht sollte nun versendet worden sein an den Client")
-            logging.info(f"Die Antwort {antwort} wurden an {adresseclient} gesendet")
+            logging.info(f"Die Antwort {antwort} wurden an {adressloadbalancer} gesendet")
         except Exception as sendefehler:
             logging.error("Die Antwort konnte nicht versendet werden")    
             
