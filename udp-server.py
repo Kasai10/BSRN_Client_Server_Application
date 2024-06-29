@@ -35,7 +35,7 @@ def server(port): #Hier eine Function, die dann die gesamte funktionalität des 
         antwort = f"status:success, message: Ihre Nachricht wurde entgegengenommen,data: {konkretenachricht}"
                 
         try:
-            socket1.sendto(antwort.encode(), adressloadbalancer) 
+            socket1.sendto(antwort.encode(), adressloadbalancer) #Hier wird die antwort message zurück an den Loabalancer geleitet.
             logging.info(f"Die Antwort {antwort} wurden an {adressloadbalancer} gesendet")
         except Exception as sendefehler:
             logging.error("Die Antwort konnte nicht versendet werden")    
