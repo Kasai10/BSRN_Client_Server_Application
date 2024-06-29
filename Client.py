@@ -50,14 +50,18 @@ def get_payload():
     })
     return payload, server_type, load_balancer_host
 
-#Initiates a connection to the load balancer, sends the payload and prints the responses
+#Initiates a connection to the load balancer
 def communicate_with_load_balancer(payload, server_type, load_balancer_host):
     try:
+        #Creates a TCP socket
         tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        #Connects to the load balancer
         tcp_socket.connect((load_balancer_host, LOAD_BALANCER_PORT))
+        #Sends the payload
         tcp_socket.sendall(payload.encode())
         print("[INFO] Payload sent to the load balancer.")
-
+        
+        #Receives response
         response = tcp_socket.recv(1024).decode()
         if response:
             if "TCP" in server_type:
