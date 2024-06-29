@@ -60,18 +60,20 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(response.encode())
 
             # Log response to Client
-            logging.info(f"Following message sent to client: \n{response}")
+            logging.info(f"Following message sent to Client: \n{response}")
             print(f"{response_message}\n")
 
         # Log error if connection is reset by client before answer is possible
         except ConnectionResetError:
-            logging.error(f"Connection reset by client during {method} request")
+            logging.error(f"Connection reset by Client during {method} request")
             self.send_error(500, "Connection reset by client")
         except Exception as e:
             logging.error(f"Error responding to {method} request: {e}")
             self.send_error(500, "Internal Server Error")
-        #finally:
-        #   self.wfile.flush()  # Ensure all data is flushed before closing the connection
+        
+        # Ensure all data is flushed before closing the connection
+        finally:
+            self.wfile.flush()  
  
     # Override and personalise log_request method
     def log_request(self, code='-', size='-'):
@@ -83,7 +85,7 @@ def start_server():
     httpd = HTTPServer(server_address, RequestHandler)
 
     # Log server start
-    start_info = f"TCP server has started on port 8000"
+    start_info = f"TCP-Server has started on port 8000"
     logging.info(start_info)
     print(start_info)
 
@@ -94,6 +96,7 @@ def start_server():
     # Server shutdown by user (ctrl+c)
     except KeyboardInterrupt:
         logging.info("Server shutdown initiated by user")
+    
     except (OSError) as e:
         logging.error(f"Server startup error: {e}")
     except Exception as e:
@@ -102,7 +105,8 @@ def start_server():
     # Close server, log that the server is closed
     finally:
         httpd.server_close()
-        logging.info(f"TCP Server is closed")   
+        logging.info(f"TCP-Server is closed") 
+        print("TCP-Server closed")  
 
  
 # Start logging
