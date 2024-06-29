@@ -37,7 +37,7 @@ def connect_to_tcp_server(server_port, rest_data, client_socket):
     data_json = json.dumps(rest_data)
     try:
         conn = http.client.HTTPConnection(server_address[0], server_address[1])
-        headers = {'Content-type': 'application/json'}
+        headers = {'Content-type': 'json'}
         method = rest_data.pop('Method')
 
         # Decide wether or not a body is needed
