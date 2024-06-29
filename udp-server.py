@@ -13,38 +13,38 @@ def server(port): #Hier eine Function, die dann die gesamte funktionalität des 
         logging.error(f"Das Erstellen des Sockets mit Port : {port} hat nicht funktioniert")
         return
     try:
-        adresse=('localhost', port) #Festlegen  von Serveradresse und des Ports als Tupel für die bind methode
-        socket1.bind(adresse) #Bindet das Socket an die Adresse.
-        logging.info(f"Socket wurde an die Adresse {adresse} gebunden")
+        address=('localhost', port) #Festlegen  von Serveradresse und des Ports als Tupel für die bind methode
+        socket1.bind(address) #Bindet das Socket an die Adresse.
+        logging.info(f"Socket wurde an die Adresse {address} gebunden")
     except Exception as bindfailed:
-         logging.error(f"Das Binden des Sockets an die Adresse {adresse} hat nicht geklappt")
+         logging.error(f"Das Binden des Sockets an die Adresse {address} hat nicht geklappt")
          return
     
     while True: #Endlosschleife, wo der Server permanent auf neue Nachrichten wartet.
         try:
-                nachricht, adressloadbalancer = socket1.recvfrom(buffersize) #Wartet auf Nachricht, empfängt diese und gibt die nachricht und die Adresse zurück
+                message, addressloadbalancer = socket1.recvfrom(buffersize) #Wartet auf Nachricht, empfängt diese und gibt die nachricht und die Adresse zurück
         except Exception as receiveerror:
                 logging.error("Die Nachricht konnte nicht Empfangen werden")
                 continue
         try:    
-                    konkretenachricht = nachricht.decode() #Hier wird die nachricht dann decodiert, weil sie normalerweise als Binärdaten empfangen wird.
-                    logging.info(f"Empfangene Nachricht von {adressloadbalancer}: {konkretenachricht}") 
+                    decodedmessage = message.decode() #Hier wird die nachricht dann decodiert, weil sie normalerweise als Binärdaten empfangen wird.
+                    logging.info(f"Empfangene Nachricht von {addressloadbalancer}: {decodedmessage}") 
         except Exception as decodeerror:
                    logging.error("Die nachricht konnte nicht entschlüsselt werden")
                    continue
-        antwort = f"status:success, message: Ihre Nachricht wurde entgegengenommen,data: {konkretenachricht}"
+        answer = f"status:success, message: Ihre Nachricht wurde entgegengenommen,data: {decodedmessage}"
                 
         try:
-            socket1.sendto(antwort.encode(), adressloadbalancer) #Hier wird die antwort message zurück an den Loabalancer geleitet.
-            logging.info(f"Die Antwort {antwort} wurden an {adressloadbalancer} gesendet")
+            socket1.sendto(answer.encode(), addressloadbalancer) #Hier wird die antwort message zurück an den Loabalancer geleitet.
+            logging.info(f"Die Antwort {answer} wurden an {addressloadbalancer} gesendet")
         except Exception as senderror:
             logging.error("Die Antwort konnte nicht versendet werden")    
             
 if __name__=="__main__": #Das hier ist quasi eine Sicherheitsvorkehrung dass der Code nur ausgeführt wird wenn das Skript direkt ausgeführt wird, damit mien code nicht einfach startet.
     argumentparser = argparse.ArgumentParser(description="UDP-Server")
-    argumentparser.add_argument('-logdatei', dest='logdatei', type=str, required=True, help='Pfad und Name der Lodatei')
+    argumentparser.add_argument('-logfile', dest='logfile', type=str, required=True, help='Pfad und Name der Lodatei')
     args =argumentparser.parse_args()
-    loggingfunction(args.logdatei)
+    loggingfunction(args.logfile)
     server(8887) 
 
 
