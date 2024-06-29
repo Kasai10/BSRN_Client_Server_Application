@@ -23,6 +23,7 @@ def get_server_type():
 
 #Prompt the user to choose an HTTP method if the TCP server was selected
 def get_http_method(server_type):
+    #Returns empty string if server is a UDP server
     if server_type == "UDP-Server":
      return ""
     while True:
@@ -70,9 +71,11 @@ def communicate_with_load_balancer(payload, server_type, load_balancer_host):
                 print("[INFO] Response from the UDP server:")
             print(response)
         else:
+            #Error handling
             print("[ERROR] No response received from the server.")
     except socket.error as e:
         print(f"[ERROR] Socket error: {e} ")
+        #Closes socket
     finally:
             tcp_socket.close()
 
