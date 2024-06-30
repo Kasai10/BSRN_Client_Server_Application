@@ -1,33 +1,33 @@
-import socket #Die bibliothek brauche ich natürlich um Zugriff auf Netzwerksockets zu erhalten und einen Netzwerkserver zu erstellen.
-import logging #Damit ein feedback zum client via file entsteht
-import argparse #Bibliothek fürs Logging
-def loggingfunction(log_file_path): #Funktion, die das logging implementiert
+import socket #Library to access sockets and create an network server
+import logging #Library to create a logfile which provides us with feedback 
+import argparse #Library to parse commandline arguments
+def loggingfunction(log_file_path): #Function which implements logging
         logging.basicConfig(filename=log_file_path, level=logging.INFO, format='%(asctime)s%(levelname)s%(message)s')
         logging.info("UDP Server startet")
-def server(port): #Hier eine Function, die dann die gesamte funktionalität des Servers umfasst
-    buffersize = 4096 #Deklarieren von Buffersize für n die recvfrom Methode
+def server(port): #Function that has the main server operations
+    buffersize = 4096 #Sets buffersize for the receiving method
     try:
-        socket1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #Hier wird dann halt das Socket als UDP Socket erstellt, der IPv4-Adressem benutzt.
-        logging.info ("Ein neues Socket wurde erstellt") #Für die bessere Übersicht dann einfach nh response, dass das Socket erstellt worden ist, wenn alles glatt läuft
+        socket1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #Creates a UDP socket for IPv4 addresses.
+        logging.info ("Ein neues Socket wurde erstellt") 
     except Exception as socketerror:
         logging.error(f"Das Erstellen des Sockets mit Port : {port} hat nicht funktioniert")
         return
     try:
-        address=('localhost', port) #Festlegen  von Serveradresse und des Ports als Tupel für die bind methode
-        socket1.bind(address) #Bindet das Socket an die Adresse.
+        address=('localhost', port) #Sets the server address and the port
+        socket1.bind(address) #Binds the socket to the address
         logging.info(f"Socket wurde an die Adresse {address} gebunden")
     except Exception as bindfailed:
          logging.error(f"Das Binden des Sockets an die Adresse {address} hat nicht geklappt")
          return
     
-    while True: #Endlosschleife, wo der Server permanent auf neue Nachrichten wartet.
+    while True: #Infinite loop where the server waits for new messages
         try:
-                message, addressloadbalancer = socket1.recvfrom(buffersize) #Wartet auf Nachricht, empfängt diese und gibt die nachricht und die Adresse zurück
+                message, addressloadbalancer = socket1.recvfrom(buffersize) #Waits for a message, receives it and returns the message and address.
         except Exception as receiveerror:
                 logging.error("Die Nachricht konnte nicht Empfangen werden")
                 continue
         try:    
-                    decodedmessage = message.decode() #Hier wird die nachricht dann decodiert, weil sie normalerweise als Binärdaten empfangen wird.
+                    decodedmessage = message.decode() #Decodes message since it will be received as binary data.
                     logging.info(f"Empfangene Nachricht von {addressloadbalancer}: {decodedmessage}") 
         except Exception as decodeerror:
                    logging.error("Die nachricht konnte nicht entschlüsselt werden")
@@ -35,12 +35,12 @@ def server(port): #Hier eine Function, die dann die gesamte funktionalität des 
         answer = f"status:success, message: Ihre Nachricht wurde entgegengenommen,data: {decodedmessage}"
                 
         try:
-            socket1.sendto(answer.encode(), addressloadbalancer) #Hier wird die antwort message zurück an den Loabalancer geleitet.
+            socket1.sendto(answer.encode(), addressloadbalancer) #Here the message will be send back to the loadbalancer
             logging.info(f"Die Antwort {answer} wurden an {addressloadbalancer} gesendet")
         except Exception as senderror:
             logging.error("Die Antwort konnte nicht versendet werden")    
             
-if __name__=="__main__": #Das hier ist quasi eine Sicherheitsvorkehrung dass der Code nur ausgeführt wird wenn das Skript direkt ausgeführt wird, damit mien code nicht einfach startet.
+if __name__=="__main__": #This part ensures the code runs only if the script is executed directly
     argumentparser = argparse.ArgumentParser(description="UDP-Server")
     argumentparser.add_argument('-logfile', dest='logfile', type=str, required=True, help='Pfad und Name der Lodatei')
     args =argumentparser.parse_args()
