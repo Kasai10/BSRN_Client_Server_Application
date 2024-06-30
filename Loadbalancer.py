@@ -28,7 +28,6 @@ def send_to_udp_server(server_port, server_type, rest_data, client_socket):
     except Exception as e:
         print(f"Error sending to UDP-Server: {e}")
     finally:
-        client_socket.close()
         server_socket.close()
 
 # Connect to TCP-Server, send Data to it and forward it to Client
@@ -60,8 +59,6 @@ def connect_to_tcp_server(server_port, rest_data, client_socket):
 
     except Exception as e:
         print(f"Error connecting to TCP-Server: {e}")
-    finally:
-        client_socket.close()
 
 # Find out which server type is required
 def get_server_by_name(server_name, rest_data, client_socket):
