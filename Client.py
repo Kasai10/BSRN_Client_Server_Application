@@ -23,6 +23,7 @@ def get_server_type():
 
 #Prompt the user to choose an HTTP method if the TCP server was selected
 def get_http_method(server_type):
+    #Returns empty string if server is a UDP server
     if server_type == "UDP-Server":
      return ""
     while True:
@@ -50,14 +51,18 @@ def get_payload():
     })
     return payload, server_type, load_balancer_host
 
-#Initiates a connection to the load balancer, sends the payload and prints the responses
+#Initiates a connection to the load balancer
 def communicate_with_load_balancer(payload, server_type, load_balancer_host):
     try:
+        #Creates a TCP socket
         tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        #Connects to the load balancer
         tcp_socket.connect((load_balancer_host, LOAD_BALANCER_PORT))
+        #Sends the payload
         tcp_socket.sendall(payload.encode())
         print("[INFO] Payload sent to the load balancer.")
-
+        
+        #Receives response
         response = tcp_socket.recv(1024).decode()
         if response:
             if "TCP" in server_type:
@@ -66,9 +71,11 @@ def communicate_with_load_balancer(payload, server_type, load_balancer_host):
                 print("[INFO] Response from the UDP server:")
             print(response)
         else:
+            #Error handling
             print("[ERROR] No response received from the server.")
     except socket.error as e:
         print(f"[ERROR] Socket error: {e} ")
+        #Closes socket
     finally:
             tcp_socket.close()
 

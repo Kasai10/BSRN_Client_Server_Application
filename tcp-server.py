@@ -3,31 +3,31 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import argparse
 import json
 
-# Define a request handler class that inherits from BaseHTTPRequestHandler
+# Request handler class (inherits from BaseHTTPRequestHandler) to process Client requests
 class RequestHandler(BaseHTTPRequestHandler): 
     
-    # Handle GET requests
+    # Process GET requests
     def do_GET(self):
         self.handle_payload("GET", "The resource was successfully retrieved.")
 
-    # Handle POST requests
+    # Process POST requests
     def do_POST(self):
         self.handle_payload("POST", "New resource successfully created.")
 
-    # Handle PUT requests
+    # Process PUT requests
     def do_PUT(self):
         self.handle_payload("PUT", "The resource was successfully updated.")
 
-    # Handle DELETE requests
+    # Process DELETE requests
     def do_DELETE(self):
         self.handle_payload("DELETE", "The resource was successfully deleted.")
 
-    # Common method to handle the payload from each request type
+    # Common method to process the payload from each request type
     def handle_payload(self, method, response_message):
         try:
             # Log incoming request
             logging.info(f"Incoming {method} message from Client")
-            print(f"{method} message recieved from Client")
+            print(f"{method} message received from Client")
 
             # Read and process payload for PUT and POST Requests
             if method in ['PUT', 'POST']:
@@ -55,35 +55,37 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.send_header("Content-type", "text/plain")
             self.end_headers()
 
-            # Create response message
+            # Create and send response message
             response = f"TCP-Server received following request: \n{payload} \n{response_message}"
             self.wfile.write(response.encode())
 
             # Log response to Client
-            logging.info(f"Following message sent to client: \n{response}")
+            logging.info(f"Following message sent to Client: \n{response}")
             print(f"{response_message}\n")
 
         # Log error if connection is reset by client before answer is possible
         except ConnectionResetError:
-            logging.error(f"Connection reset by client during {method} request")
+            logging.error(f"Connection reset by Client during {method} request")
             self.send_error(500, "Connection reset by client")
         except Exception as e:
             logging.error(f"Error responding to {method} request: {e}")
             self.send_error(500, "Internal Server Error")
-        #finally:
-        #   self.wfile.flush()  # Ensure all data is flushed before closing the connection
+        
+        # Ensure all data is flushed before closing the connection
+        finally:
+            self.wfile.flush()  
  
     # Override and personalise log_request method
     def log_request(self, code='-', size='-'):
         logging.info(f"Request currently being handled: \n- Client IP Address: {self.client_address[0]} \n- Request details: {self.requestline}")
 
-# start server
+# Start server
 def start_server():
     server_address = ('localhost', 8000)
     httpd = HTTPServer(server_address, RequestHandler)
 
     # Log server start
-    start_info = f"TCP server has started on port 8000"
+    start_info = "TCP-Server has started on port 8000"
     logging.info(start_info)
     print(start_info)
 
@@ -94,15 +96,17 @@ def start_server():
     # Server shutdown by user (ctrl+c)
     except KeyboardInterrupt:
         logging.info("Server shutdown initiated by user")
-    except (OSError) as e:
+    
+    except OSError as e:
         logging.error(f"Server startup error: {e}")
     except Exception as e:
         logging.error(f"Unexpected error during server startup: {e}")
     
-    # Close server, log that the server is closed
+    # Close server and create Logfile entry
     finally:
         httpd.server_close()
-        logging.info(f"TCP Server is closed")   
+        logging.info(f"TCP-Server is closed") 
+        print("TCP-Server closed")  
 
  
 # Start logging
@@ -113,7 +117,7 @@ def start_logging(log_file_path=None):
 # Main
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="TCP Server")
-    parser.add_argument('-logdatei', dest="logfile", type=str, required=True, help='Logdatei Pfad und Name')
+    parser.add_argument('-logdatei', dest="logfile", type=str, required=True, help='Logfile path and name')
     args = parser.parse_args()
     start_logging(args.logfile)
     start_server()
